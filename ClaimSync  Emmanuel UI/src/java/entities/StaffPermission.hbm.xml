@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated Sep 12, 2012 4:07:19 PM by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="entities.StaffPermission" table="staffPermission" catalog="extended">
+        <composite-id name="id" class="entities.StaffPermissionId">
+            <key-property name="permissionid" type="int">
+                <column name="permissionid" />
+            </key-property>
+            <key-property name="staffid" type="string">
+                <column name="staffid" length="100" />
+            </key-property>
+        </composite-id>
+    </class>
+</hibernate-mapping>
