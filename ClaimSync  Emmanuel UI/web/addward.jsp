@@ -8,6 +8,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
     <head>
         <meta charset="utf-8">
@@ -66,6 +71,7 @@
                 if(t){
                     var name = document.getElementById("name").value;
                     var beds = document.getElementById("beds").value;
+                    //var ty = document.getElementById("beds").value;
                     $.post('action/wardaction.jsp', { action : "wards", name : name, beds : beds}, function(data) {
                         alert(data);
                         $('#results').html(data).hide().slideDown('slow');
@@ -155,7 +161,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>

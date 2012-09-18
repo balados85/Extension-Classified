@@ -59,6 +59,30 @@ public class HMSHelper {
         return patient;
     }
 
+    public Appoint addAppointment(String doctorId, String patientId, String content, String start, String allDay, String end, String title) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        Appoint app = new Appoint();
+
+
+
+        app.setDoctorId(doctorId);
+        app.setPatientId(patientId);
+        app.setContent(content);
+        app.setStart(start);
+        app.setAllday(allDay);
+        app.setEnd(end);
+        app.setTitle(title);
+        app.setHonored(Boolean.FALSE);
+        // type.setId(id);
+
+
+
+        session.save(app);
+        session.getTransaction().commit();
+        return app;
+    }
+
     public Folder createFolder(String foldernumber, String shelvenumber, String status, String previouslocation) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -114,11 +138,12 @@ public class HMSHelper {
         return sponsorDetails;
     }
 
-    public Units addUnit(String name) {
+    public Units addUnit(String name, String type) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         Units unit = new Units();
         unit.setUnitname(name);
+        unit.setType(type);
 
         session.save(unit);
         session.getTransaction().commit();
@@ -132,6 +157,7 @@ public class HMSHelper {
         unit.setWardname(name);
         unit.setNumberofbeds(numberofbeds);
         unit.setOccupied(0);
+        unit.setType("ward");
 
         session.save(unit);
         session.getTransaction().commit();
@@ -171,6 +197,7 @@ public class HMSHelper {
         session.beginTransaction();
         Consultingrooms conroom = new Consultingrooms();
         conroom.setConsultingroom(name);
+        conroom.setType("consultation");
 
         session.save(conroom);
         session.getTransaction().commit();
@@ -254,6 +281,7 @@ public class HMSHelper {
         Consultation diagnosisObj = new Consultation();
         diagnosisObj.setContype(type);
         diagnosisObj.setAmount(amount);
+        //diagnosisObj.s
 
         session.save(diagnosisObj);
         session.getTransaction().commit();
@@ -360,14 +388,16 @@ public class HMSHelper {
         return transferlocation;
     }
 
-    public Qualification addStaffQualification(String qualification, Date startYear, Date endYear, String institution, String staffid) {
+    public Qualification addStaffQualification(String qualification, String startYear, String endYear, String institution, String staffid) throws ParseException {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
+
         Qualification qualification1 = new Qualification();
-        qualification1.setFrom(endYear);
+        qualification1.setStartyear(startYear);
         qualification1.setInstitution(institution);
         qualification1.setQualification(qualification);
-        qualification1.setTo(endYear);
+
+        qualification1.setEndyear(endYear);
         qualification1.setStaffid(staffid);
 
 
@@ -376,31 +406,35 @@ public class HMSHelper {
         return qualification1;
     }
 
-    public Stafftable addStafftable(String staffid, String firstname, String lastname, String othername, String ssn, Date dob, String placeofbirth, Date year, int role, String extraduty, String address, String contact, String nextofkin, String nextofkincontact, int unit, String imglocation) {
+    public Stafftable addStaff(String employeeid, String lastname, String othername, String ssn, String dob, String pob, String yearemployed, String email, String gender, String contact, String address, String nextofkin, String kincontact, int departmentid, int roleid, String extraduty, String imglocation) throws ParseException {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
+
         Stafftable stafftable = new Stafftable();
+
+        stafftable.setActive(Boolean.TRUE);
         stafftable.setAddress(address);
         stafftable.setContact(contact);
         stafftable.setDob(dob);
-        stafftable.setFirstname(firstname);
+        stafftable.setEmail(email);
+        stafftable.setExtraduty(extraduty);
+        stafftable.setGender(gender);
+        stafftable.setImglocation(imglocation);
         stafftable.setLastname(lastname);
         stafftable.setNextofkin(nextofkin);
-        stafftable.setNextofkincontact(nextofkincontact);
+        stafftable.setNextofkincontact(kincontact);
         stafftable.setOthername(othername);
-        stafftable.setPlaceofbirth(placeofbirth);
-        stafftable.setRole(role);
+        stafftable.setPlaceofbirth(pob);
+        stafftable.setRole(roleid);
         stafftable.setSsn(ssn);
-        stafftable.setStaffid(staffid);
-        stafftable.setUnit(unit);
-        stafftable.setYearofemployment(year);
-        stafftable.setExtraduty(extraduty);
-        stafftable.setImglocation(imglocation);
-        stafftable.setActive(Boolean.TRUE);
+        stafftable.setStaffid(employeeid);
+        stafftable.setUnit(departmentid);
+        stafftable.setYearofemployment(yearemployed);
 
         session.save(stafftable);
         session.getTransaction().commit();
         return stafftable;
+
     }
 
     public Patientinvestigation addPatientInvestigation(String patientid, String code, int investigationid, String result, Double price, int visitationid, String visitDate, String performed, String notes, int qty) throws ParseException {
@@ -527,6 +561,26 @@ public class HMSHelper {
         return symptoms;
     }
 
+    public Users addUser(Users users) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+
+        session.save(users);
+        session.getTransaction().commit();
+        return users;
+    }
+
+    public Loggingtable addLogging(Loggingtable loggingtable) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+
+        session.save(loggingtable);
+        session.getTransaction().commit();
+        return loggingtable;
+    }
+
     public Roletable addRole(String rolename, String roledesceription) throws ParseException {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -545,7 +599,7 @@ public class HMSHelper {
 
         Department roletable = new Department();
         roletable.setDepartment(rolename);
-        
+
         session.save(roletable);
         session.getTransaction().commit();
         return roletable;
@@ -557,23 +611,24 @@ public class HMSHelper {
 
         Permission roletable = new Permission();
         roletable.setPermission(rolename);
-        
+
         session.save(roletable);
         session.getTransaction().commit();
         return roletable;
     }
 
-    public StaffPermissionId addStaffPermission(int permissionid, String staffid) throws ParseException {
+    public StaffPermission addStaffPermission(int permissionid, String staffid) throws ParseException {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        StaffPermissionId roletable = new StaffPermissionId();
-        roletable.setPermissionid(permissionid);
-        roletable.setStaffid(staffid);
-       
-        session.save(roletable);
+        StaffPermission staffPermission = new StaffPermission();
+        staffPermission.setPermissionid(permissionid);
+        staffPermission.setStaffid(staffid);
+
+        //staffPermission.setId(staffPermission);
+        session.save(staffPermission);
         session.getTransaction().commit();
-        return roletable;
+        return staffPermission;
     }
 
     public Dosage addDosage(String shortCut, String desceription) throws ParseException {
@@ -671,6 +726,54 @@ public class HMSHelper {
         return result;
     }
 
+    public List listUsers() {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Users").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List login(String username, String password) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Users where username='" + username + "' and password='" + password + "'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List listUsers(String staffid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Users where staffid='" + staffid + "'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List listLoggings() {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Loggingtable").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List listLoggingsByDate(String date) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Loggingtable where date='" + date + "'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List listLoggingsByUserid(String userid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Loggingtable where userd='" + userid + "'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
     public List listFolders() {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -726,6 +829,7 @@ public class HMSHelper {
         session.getTransaction().commit();
         return result;
     }
+
     public List listDepartments() {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -733,6 +837,7 @@ public class HMSHelper {
         session.getTransaction().commit();
         return result;
     }
+
     public List listPermissions() {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -780,11 +885,11 @@ public class HMSHelper {
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List listSecondaryConsultation(String unitname) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from Visitationtable where status='"+unitname+"' and review="+Boolean.TRUE).list();
+        List result = session.createQuery("from Visitationtable where status='" + unitname + "' and review=" + Boolean.TRUE).list();
         session.getTransaction().commit();
         return result;
     }
@@ -954,27 +1059,27 @@ public class HMSHelper {
         System.out.println("here" + fname);
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%"+fname+"%'").list();
+        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%" + fname + "%'").list();
 
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List getPatientByFName(String fname) {
         System.out.println("here" + fname);
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%"+fname+"%'").list();
+        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%" + fname + "%'").list();
 
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List getPatientByLName(String fname) {
         System.out.println("here" + fname);
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%"+fname+"%'").list();
+        List result = session.createQuery("from Patient where fname like '%" + fname + "%' or lname like '%" + fname + "%'").list();
 
         session.getTransaction().commit();
         return result;
@@ -1295,6 +1400,14 @@ public class HMSHelper {
         return result;
     }
 
+    public List listAppointment() {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Appoint").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
     public List listConsultation() {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -1310,7 +1423,7 @@ public class HMSHelper {
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List listStaffInDepartment(int departmentid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -1318,15 +1431,15 @@ public class HMSHelper {
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List listStaffPermissions(String staffid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from StaffPermission where staffid='" + staffid+"'").list();
+        List result = session.createQuery("from StaffPermission where staffid='" + staffid + "'").list();
         session.getTransaction().commit();
         return result;
     }
-    
+
     public List listStaffWithPermissions(int permissionid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -1407,7 +1520,7 @@ public class HMSHelper {
     public List listLabordersByPatientid(String patientid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
-        List result = session.createQuery("from Laborders where patientid='"+patientid+"'").list();
+        List result = session.createQuery("from Laborders where patientid='" + patientid + "'").list();
         session.getTransaction().commit();
         return result;
     }
@@ -1484,8 +1597,8 @@ public class HMSHelper {
         session.getTransaction().commit();
         return visit;
     }
-    
-    public  Visitationtable updateVisitation(int visitid){
+
+    public Visitationtable updateVisitation(int visitid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
@@ -1496,8 +1609,20 @@ public class HMSHelper {
         session.getTransaction().commit();
         return visit;
     }
-    
-    public  Permission updatePermission(int permissionid, String permision){
+
+    public Visitationtable updateVisitation(int visitid, String doctor) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Visitationtable visit = (Visitationtable) session.get(Visitationtable.class, visitid);
+        visit.setDoctor(doctor);
+
+        session.update(visit);
+        session.getTransaction().commit();
+        return visit;
+    }
+
+    public Permission updatePermission(int permissionid, String permision) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
@@ -1508,8 +1633,8 @@ public class HMSHelper {
         session.getTransaction().commit();
         return visit;
     }
-    
-     public  Department updateDepartment(int departmentid, String department){
+
+    public Department updateDepartment(int departmentid, String department) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
@@ -1542,8 +1667,17 @@ public class HMSHelper {
         session.getTransaction().commit();
         return folder;
     }
-    
-     public Patienttreatment updatePatientTreatment(int ptid, String yes) {
+
+    public Loggingtable updateLogout(Loggingtable loggingtable) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        session.update(loggingtable);
+        session.getTransaction().commit();
+        return loggingtable;
+    }
+
+    public Patienttreatment updatePatientTreatment(int ptid, String yes) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         Patienttreatment folder = (Patienttreatment) session.get(Patienttreatment.class, ptid);
@@ -1553,7 +1687,6 @@ public class HMSHelper {
         session.getTransaction().commit();
         return folder;
     }
-    
 
     public Clerkingquestion updateClerkingFrequency(int questionid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -1584,7 +1717,7 @@ public class HMSHelper {
         folder.setConcentration(concentration);
         folder.setResultrange(range);
         folder.setPerformed(yes);
-       // folder.setAmountpaid(amountpaid);
+        // folder.setAmountpaid(amountpaid);
         session.update(folder);
         session.getTransaction().commit();
         return folder;
@@ -1653,11 +1786,47 @@ public class HMSHelper {
 
         visit.setDonedate(new Date());
         visit.setDone(Boolean.TRUE);
-        
+
 
         session.update(visit);
         session.getTransaction().commit();
         return visit;
+    }
+
+    public Appoint updateAppointment(String start, String allDay, String end, String title, String doctorId, String patientId, String content, int id) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Appoint app = (Appoint) session.get(Appoint.class, id);
+
+        app.setDoctorId(doctorId);
+        app.setPatientId(patientId);
+        app.setContent(content);
+        app.setStart(start);
+        app.setAllday(allDay);
+        app.setEnd(end);
+        app.setTitle(title);
+        app.setId(id);
+
+        session.update(app);
+        session.getTransaction().commit();
+        return app;
+    }
+
+    public List EditAppointment(String title) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Appoint where title = '" + title + "'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
+    public List EditTitle(String start) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Appoint where start = '" + start + "'").list();
+        session.getTransaction().commit();
+        return result;
     }
 
     public Patientconsultation updatePatientConsultation(int id, double amountpaid, String status) {
@@ -1682,7 +1851,7 @@ public class HMSHelper {
 
         visit.setDonedate(new Date());
         visit.setViewed(Boolean.TRUE);
-
+        visit.setTodoc(todoc);
         session.update(visit);
         session.getTransaction().commit();
         return visit;
@@ -1814,12 +1983,30 @@ public class HMSHelper {
         return wardnote;
     }
 
-    public Stafftable updateStaffDetails(Stafftable stafftable) {
+    public Stafftable updateStaffDetails(String employeeid, String lastname, String othername, String ssn, String dob, String pob, String yearemployed, String email, String gender, String contact, String address, String nextofkin, String kincontact, int departmentid, int roleid, String extraduty, String imglocation) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
-        //Wardnote wardnote = (Wardnote) session.get(Wardnote.class, noteid);
-        //wardnote.setNote(note);
+        Stafftable stafftable = new Stafftable();
+
+        stafftable.setActive(Boolean.TRUE);
+        stafftable.setAddress(address);
+        stafftable.setContact(contact);
+        stafftable.setDob(dob);
+        stafftable.setEmail(email);
+        stafftable.setExtraduty(extraduty);
+        stafftable.setGender(gender);
+        stafftable.setImglocation(imglocation);
+        stafftable.setLastname(lastname);
+        stafftable.setNextofkin(nextofkin);
+        stafftable.setNextofkincontact(kincontact);
+        stafftable.setOthername(othername);
+        stafftable.setPlaceofbirth(pob);
+        stafftable.setRole(roleid);
+        stafftable.setSsn(ssn);
+        stafftable.setStaffid(employeeid);
+        stafftable.setUnit(departmentid);
+        stafftable.setYearofemployment(yearemployed);
 
         session.update(stafftable);
         session.getTransaction().commit();
@@ -1874,15 +2061,15 @@ public class HMSHelper {
         return wardnote;
     }
 
-    public Qualification updateQualification(int quid, String qualification, Date startYear, Date endYear, String institution) {
+    public Qualification updateQualification(int quid, String qualification, String startYear, String endYear, String institution) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
 
         Qualification qualification1 = (Qualification) session.get(Qualification.class, quid);
-        qualification1.setFrom(startYear);
+        qualification1.setStartyear(startYear);
         qualification1.setInstitution(institution);
         qualification1.setQualification(qualification);
-        qualification1.setTo(endYear);
+        qualification1.setEndyear(endYear);
 
         session.update(qualification1);
         session.getTransaction().commit();
@@ -1970,7 +2157,7 @@ public class HMSHelper {
         session.getTransaction().commit();
         return sponsor;
     }
-    
+
     public Permission getPermissionByid(int permissionid) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -2101,6 +2288,36 @@ public class HMSHelper {
         return units;
     }
 
+    public Users getUserById(String userid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Users user = (Users) session.get(Users.class, userid);
+
+        session.getTransaction().commit();
+        return user;
+    }
+
+    public Users getUserByStaffid(String staffid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Users users = (Users) session.createQuery("from users where staffid='" + staffid + "'").list().get(0);
+
+        session.getTransaction().commit();
+        return users;
+    }
+
+    public Loggingtable getLoggingtableByid(int id) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Loggingtable loggingtable = (Loggingtable) session.get(Loggingtable.class, id);
+
+        session.getTransaction().commit();
+        return loggingtable;
+    }
+
     public Diagnosis getId(int id) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -2169,76 +2386,6 @@ public class HMSHelper {
 
         session.getTransaction().commit();
         return dosageMonitor;
-    }
-
-    public Roletable deleteRole(int roleid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Roletable roletable = (Roletable) session.get(Roletable.class, roleid);
-
-        session.getTransaction().commit();
-        return roletable;
-    }
-
-    public Qualification deleteQualification(int roleid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Qualification qualification = (Qualification) session.get(Qualification.class, roleid);
-
-        session.getTransaction().commit();
-        return qualification;
-    }
-
-    public Stafftable deleteStaff(int roleid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Stafftable stafftable = (Stafftable) session.get(Stafftable.class, roleid);
-
-        session.getTransaction().commit();
-        return stafftable;
-    }
-    
-    public Permission deletePermission(int permissionid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Permission stafftable = (Permission) session.get(Permission.class, permissionid);
-
-        session.getTransaction().commit();
-        return stafftable;
-    }
-    
-    public Department deleteDepartment(int departmentid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        Department stafftable = (Department) session.get(Department.class, departmentid);
-
-        session.getTransaction().commit();
-        return stafftable;
-    }
-    
-    public void deleteStaffPermissionWhereStaffid(String staffid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        StaffPermission stafftable = (StaffPermission) session.get(StaffPermission.class, staffid);
-
-        session.getTransaction().commit();
-        //return stafftable;
-    }
-    
-    public void deleteStaffPermissionWherePermid(int permid) {
-        session = HibernateUtil.getSessionFactory().getCurrentSession();
-        session.beginTransaction();
-
-        StaffPermission stafftable = (StaffPermission) session.get(StaffPermission.class, permid);
-
-        session.getTransaction().commit();
-        //return stafftable;
     }
 
     public Symptoms getSymptomById(int symptomid) {
@@ -2316,7 +2463,7 @@ public class HMSHelper {
         session.beginTransaction();
 
         Consultation dosageMonitor = (Consultation) session.get(Consultation.class, id);
-
+        //session.delete(dosageMonitor);
         session.getTransaction().commit();
         return dosageMonitor;
     }
@@ -2455,6 +2602,109 @@ public class HMSHelper {
         session.getTransaction().commit();
 
         return unit;
+    }
+
+    public Roletable deleteRole(int roleid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Roletable roletable = (Roletable) session.get(Roletable.class, roleid);
+        session.delete(roletable);
+        session.getTransaction().commit();
+        return roletable;
+    }
+
+    public Qualification deleteQualification(int roleid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Qualification qualification = (Qualification) session.get(Qualification.class, roleid);
+        session.delete(qualification);
+        session.getTransaction().commit();
+        return qualification;
+    }
+
+    public Stafftable deleteStaff(String staffid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Stafftable stafftable = (Stafftable) session.get(Stafftable.class, staffid);
+        //session.delete(stafftable);
+        stafftable.setActive(Boolean.FALSE);
+        session.getTransaction().commit();
+        return stafftable;
+    }
+
+    public Permission deletePermission(int permissionid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Permission stafftable = (Permission) session.get(Permission.class, permissionid);
+        session.delete(stafftable);
+        session.getTransaction().commit();
+        return stafftable;
+    }
+
+    public Department deleteDepartment(int departmentid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Department stafftable = (Department) session.get(Department.class, departmentid);
+        session.delete(stafftable);
+
+        session.getTransaction().commit();
+        return stafftable;
+    }
+
+    public void deleteStaffPermissionWhereStaffid(int permid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        StaffPermission staffPermission = (StaffPermission) session.get(StaffPermission.class, permid);
+        session.delete(staffPermission);
+        session.getTransaction().commit();
+        //return stafftable;
+    }
+
+    public void deleteStaffPermissionWherePermid(int permid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        StaffPermission stafftable = (StaffPermission) session.get(StaffPermission.class, permid);
+        session.delete(stafftable);
+        session.getTransaction().commit();
+        //return stafftable;
+    }
+
+    public void deleteUser(String userid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Users user = (Users) session.get(Users.class, userid);
+        session.delete(user);
+        session.getTransaction().commit();
+        //return stafftable;
+    }
+
+    public Appoint deleteAppointment(int id) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        //   Query result = session.createQuery("delete from ItemsTable where items_id = "+id);
+        Appoint app = (Appoint) session.get(Appoint.class, id);
+        session.delete(app);
+        session.getTransaction().commit();
+
+        return app;
+    }
+
+    public void deleteUserByStaffid(String staffid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Users user = (Users) session.createQuery("delete from Users where staffid = '" + staffid + "'");
+        //session.delete(user);
+        session.getTransaction().commit();
+        //return stafftable;
     }
 
     public Boolean ifEmpty() {

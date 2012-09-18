@@ -5,6 +5,11 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
+     Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         HMSHelper mgr = new HMSHelper();
 
@@ -36,32 +41,15 @@
                         double amountpaid = request.getParameter("mn_"+tids[r])==null ? 0.0 : Double.parseDouble(request.getParameter("mn_"+tids[r]));
                         mgr.updatePatientTreatment(Integer.parseInt(tids[r]), "paid",amountpaid);
                     }
-                    mgr.updateFolderLocation("Accounts", "Pharmacy", patientid);
-                    mgr.updateVisitationStatus(visitid, "Pharmacy", "Accounts");
+                    mgr.updateFolderLocation((String)session.getAttribute("unit"), unitName, patientid);
+                    mgr.updateVisitationStatus(visitid, unitName, (String)session.getAttribute("unit"));
                     session.setAttribute("lasterror", "Saved soccessfully");
                     response.sendRedirect("../accounts.jsp");
                     return;
                 }
-                /*if (vids != null) {
-                 for (int r = 0; r < vids.length; r++) {
-                 //Patienttreatment patienttreatment = mgr.getPatientTreatment(Integer.parseInt(ptid[r]));
-                 //System.out.println("hello"+vids[r]);
-                 double amountpaid = request.getParameter("nm_" + vids[r]) == "" ? 0 : Double.parseDouble(request.getParameter("nm_" + vids[r]));
-                 mgr.updatePatientInvestigation(Integer.parseInt(vids[r]), "", "No", amountpaid);
-                 }
-                 if (checks != null) {
-                 for (int r = 0; r < checks.length; r++) {
-                 mgr.updatePatientInvestigationPayment(Integer.parseInt(checks[r]));
-                 }
-                 }
-                 mgr.updateFolderLocation("Accounts", "Laboratory", patientid);
-                 mgr.updateVisitationStatus(visitid, "Laboratory", "Accounts");
-                 session.setAttribute("lasterror", "Saved soccessfully");
-                 response.sendRedirect("../accounts.jsp");
-                 return;
-                 }*/
-                mgr.updateFolderLocation("Accounts", unitName, patientid);
-                mgr.updateVisitationStatus(visitid, unitName, "Accounts");
+                
+                mgr.updateFolderLocation((String)session.getAttribute("unit"), unitName, patientid);
+                mgr.updateVisitationStatus(visitid, unitName, (String)session.getAttribute("unit"));
                 session.setAttribute("lasterror", "Successfully forwarded");
                 response.sendRedirect("../accounts.jsp");
                 return;
@@ -87,22 +75,10 @@
 
 
             if (pid != null) {
-                // System.out.println(patientid);
-                /*if (tids != null) {
-                 for (int r = 0; r < tids.length; r++) {
-                 //Patienttreatment patienttreatment = mgr.getPatientTreatment(Integer.parseInt(ptid[r]));
-                 mgr.updatePatientTreatment(Integer.parseInt(tids[r]), "paid");
-                 }
-                 mgr.updateFolderLocation("Accounts", "Pharmacy", patientid);
-                 mgr.updateVisitationStatus(visitid, "Pharmacy", "Accounts");
-                 session.setAttribute("lasterror", "Saved soccessfully");
-                 response.sendRedirect("../accounts.jsp");
-                 return;
-                 }*/
+                
                 if (vids != null) {
                     for (int r = 0; r < vids.length; r++) {
-                        //Patienttreatment patienttreatment = mgr.getPatientTreatment(Integer.parseInt(ptid[r]));
-                        //System.out.println("hello"+vids[r]);
+                       
                         double amountpaid = request.getParameter("nm_" + vids[r]) == "" ? 0 : Double.parseDouble(request.getParameter("nm_" + vids[r]));
                         mgr.updatePatientInvestigation(Integer.parseInt(vids[r]), "","","", "No", amountpaid);
                     }
@@ -111,23 +87,21 @@
                             mgr.updatePatientInvestigationPayment(Integer.parseInt(checks[r]));
                         }
                     }
-                    mgr.updateFolderLocation("Accounts", "Laboratory", pid);
-                    mgr.updateVisitationStatus(vstid, "Laboratory", "Accounts");
+                    mgr.updateFolderLocation((String)session.getAttribute("unit"), uName, pid);
+                    mgr.updateVisitationStatus(vstid, uName, (String)session.getAttribute("unit"));
                     session.setAttribute("lasterror", "Saved soccessfully");
                     response.sendRedirect("../accounts.jsp");
                     return;
                 }
-                mgr.updateFolderLocation("Accounts", uName, pid);
-                mgr.updateVisitationStatus(vstid, uName, "Accounts");
+                mgr.updateFolderLocation((String)session.getAttribute("unit"), uName, pid);
+                mgr.updateVisitationStatus(vstid, uName, (String)session.getAttribute("unit"));
                 session.setAttribute("lasterror", "Successfully forwarded");
                 response.sendRedirect("../accounts.jsp");
                 return;
             }
         }
         if ("Consultation Receipt".equals(request.getParameter("action"))) {
-            //String tids[] = request.getParameterValues("pid[]") == null ? null : request.getParameterValues("pid[]");
-            //String vids[] = request.getParameterValues("vid[]") == null ? null : request.getParameterValues("vid[]");
-            // String checks[] = request.getParameterValues("checks[]") == null ? null : request.getParameterValues("checks[]");
+            
             double amountpaid = request.getParameter("amountpaid") == "" ? 0.0 : Double.parseDouble(request.getParameter("amountpaid"));
             String status = request.getParameter("status") == "" ? "unpaid" : request.getParameter("status");
 
@@ -152,8 +126,8 @@
              System.out.println(visid);
                 mgr.updatePatientConsultation(visid, amountpaid, status);
 
-                mgr.updateFolderLocation("Accounts", uame, patid);
-                mgr.updateVisitationStatus(vint, uame, "Accounts");
+                mgr.updateFolderLocation((String)session.getAttribute("unit"), uame, patid);
+                mgr.updateVisitationStatus(vint, uame, (String)session.getAttribute("unit"));
                 session.setAttribute("lasterror", "Successfully forwarded");
                 response.sendRedirect("../accounts.jsp");
                 return;
@@ -165,6 +139,7 @@
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction().commit();
         HibernateUtil.getSessionFactory().close();
         response.sendRedirect("../accounts.jsp");
+         return;
     } catch (Exception ex) {
         HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
         if (ServletException.class.isInstance(ex)) {

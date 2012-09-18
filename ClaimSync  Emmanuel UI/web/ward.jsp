@@ -6,6 +6,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -760,7 +766,7 @@
                                                 for (int v = 0; v < treatments.size(); v++) {
                                                     Nhistreatment treatment = (Nhistreatment) treatments.get(v);
                                         %>
-                                        <option value="<%=treatment.getDrug()%>><<%=treatment.getCode()%>"><%=treatment.getDrug()%></option> 
+                                        <option value="<%=treatment.getTreatment()%>><<%=treatment.getTreatmentid()%>"><%=treatment.getTreatment()%></option> 
                                         <% }
                                             }
                                         %>
@@ -958,7 +964,7 @@
                                 for (int p = 0; p < investigations.size(); p++) {
                                     Nhisinvestigation investigation = (Nhisinvestigation) investigations.get(p);
                         %>
-                        <option value="<%=investigation.getInvestigation()%>><<%= investigation.getCode()%>"><%=investigation.getInvestigation()%></option> 
+                        <option value="<%=investigation.getInvestigation()%>><<%= investigation.getInvestigationId()%>"><%=investigation.getInvestigation()%></option> 
                         <%}%>
                     </select>
                     <%}

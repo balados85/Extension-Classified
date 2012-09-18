@@ -4,13 +4,16 @@
     Author     : Lisandro
 --%>
 
-<%@page import="entities.Post"%>
-<%@page import="entities.ItemsTable"%>
-<%@page import="entities.itemHelper"%>
-<%@page import="entities.HibernateUtil"%>
+<%@page import="entities.*"%>
+
+<%@page import="helper.HibernateUtil"%>
 <%@page import="org.hibernate.classic.Session"%>
 <%@page import="java.util.*"%>
-
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
 
     <head>
@@ -132,7 +135,7 @@
 
                     HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
-                    itemHelper itm = new itemHelper();
+                    HMSHelper itm = new HMSHelper();
 
                     List itmss = itm.listSuppliers();
                     for (int i = 0; i < itmss.size(); i++) {

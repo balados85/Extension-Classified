@@ -29,8 +29,8 @@
                             <li class="divider"></li>
 
                             <li>
-                                <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
-                            </li>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
+                                    </li>
 
                         </ul>
 

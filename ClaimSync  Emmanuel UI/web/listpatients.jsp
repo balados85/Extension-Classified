@@ -17,6 +17,11 @@
                 session.setAttribute("lasterror", "patient does not exist please try again");
                 response.sendRedirect("index.jsp");
             }
+            Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } 
             //Patient patient = mgr.getPatientByID(patientid);
 %>
         <!-- Le HTML5 shim, for IE6-8 support of HTML elements -->
@@ -100,7 +105,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>

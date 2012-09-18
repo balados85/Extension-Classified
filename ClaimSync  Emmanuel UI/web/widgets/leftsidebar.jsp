@@ -23,7 +23,7 @@
             <a  href="#"><i class="icon-folder-open"></i> Patient Management</a>
             <ul>
                 <li class="subitem1">
-                    <a href="index.jsp">Front Desk </a>
+                    <a href="records.jsp">Front Desk </a>
                 </li>
                 <li class="subitem2">
                     <a href="opd.jsp">Out Patient Department </a>
@@ -176,6 +176,12 @@
                 </li>
                 <li class="subitem4">
                     <a href="addward.jsp">Add Ward</a>
+                </li>
+                <li class="subitem4">
+                    <a href="adddepartment.jsp">Add Department</a>
+                </li>
+                <li class="subitem4">
+                    <a href="addpermission.jsp">Add Permission</a>
                 </li>
                 <li class="subitem4">
                     <a href="addsponsor.jsp">Add Sponsor</a>

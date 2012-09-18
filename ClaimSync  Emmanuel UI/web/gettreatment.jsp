@@ -1,6 +1,11 @@
 <%@page import="entities.*"%>
 <%@page import="java.util.Iterator"%>
-<%@page import="java.util.List"%>s
+<%@page import="java.util.List"%>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <%    
     HMSHelper mm = new HMSHelper();
     

@@ -5,17 +5,23 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
+    Users current = (Users) session.getAttribute("staff");
+            if(current == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
         if ("units".equals(request.getParameter("action"))) {
             String unitName = request.getParameter("name");
+            String type = request.getParameter("type");
            
 
             //String registrationDate = request.getParameter("dor");
 
             HMSHelper mgr = new HMSHelper();
             Units unit = null;
-            unit = mgr.addUnit(unitName);
+            unit = mgr.addUnit(unitName,type);
             out.print("Unit Successfully Added");
             return;
         }

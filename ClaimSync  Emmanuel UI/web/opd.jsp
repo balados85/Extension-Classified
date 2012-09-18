@@ -8,6 +8,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -69,7 +74,7 @@
                                     SimpleDateFormat formatter = new SimpleDateFormat("EEEE, d MMMM yyyy");
                                     Date date = new Date();
                                     //System.out.println(dateFormat.format(date));
-                                    List visits = mgr.listUnitVisitations("OPD", dateFormat.format(date));
+                                    List visits = mgr.listUnitVisitations((String)session.getAttribute("unit"), dateFormat.format(date));
                                     // List patients = mgr.listPatients();
                                     for (int i = 0; i < visits.size(); i++) {
                                         Visitationtable visit = (Visitationtable) visits.get(i);
@@ -84,7 +89,7 @@
                                         <a href="vital.jsp?patientid=<%=visit.getPatientid()%>&id=<%=visit.getVisitid()%>"><%= visit.getPatientid()%> </a> 
                                     </td>
                                     <td>
-                                        <%= mgr.getPatientByID(visit.getPatientid()).getFname()%>
+                                       <%=mgr.getPatientByID(visit.getPatientid()).getFname()%>, <%=mgr.getPatientByID(visit.getPatientid()).getMidname()%> <%=mgr.getPatientByID(visit.getPatientid()).getLname()%>
                                     </td>
                                     <td>
                                         <%=mgr.getSponsor(mgr.sponsorshipDetails(visit.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(visit.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(visit.getPatientid()).getSponsorid()).getSponsorname()%> 
@@ -229,17 +234,12 @@
                                 <div class="controls">
                                     <select class="chzn-select medium-select select chzn-done" name="conroom">
                                         <%
-                                            Patient p = null;
-
-
-                                            p = mgr.getPatientByID(visit.getPatientid());
-                                            session.setAttribute("current", p);
-                                            List consultingrooms = mgr.listConRooms();
-                                            for (int j = 0; j < consultingrooms.size(); j++) {
-                                                Consultingrooms consultingroom = (Consultingrooms) consultingrooms.get(j);
-                                        %>
-                                        <option value="<%=consultingroom.getConsultingroom()%>"><%=consultingroom.getConsultingroom()%></option> 
-                                        <% }
+                                            List ls = mgr.listConRooms();
+                                                for(int x = 0 ; x < ls.size(); x++){
+                                                    Consultingrooms conroom = (Consultingrooms) ls.get(x);
+                                            %>
+                                            <option value="<%=conroom.getType()%>_<%=conroom.getConsultingroomid()%>"><%=conroom.getConsultingroom()%></option>
+                                                    <%}
 
                                         %>
 

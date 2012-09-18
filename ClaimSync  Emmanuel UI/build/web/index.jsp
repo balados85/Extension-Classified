@@ -1,17 +1,16 @@
-<%@page import="java.util.Calendar"%>
+<%-- 
+    Document   : pharmacy
+    Created on : Jul 26, 2012, 8:55:54 AM
+    Author     : dependable
+--%>
+
+<%@page import="helper.HibernateUtil"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
         <meta charset="utf-8">
-        <%@page contentType="text/html" pageEncoding="UTF-8"%>
-        <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
-        <%
-            HMSHelper mgr = new HMSHelper();
-            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-            Date date = new Date();
-            List visits = mgr.listRecentVisits(dateFormat.format(date));
-        %>
         <title>ClaimSync Extended</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
@@ -32,7 +31,7 @@
             @import "css/jquery.dataTables_themeroller.css";
             @import "css/custom-theme/jquery-ui-1.8.16.custom.css";
             body {
-                overflow: hidden;
+                /*    overflow: hidden; */
             }
 
             .large_button {
@@ -58,8 +57,50 @@
                 /* padding: 7px 14px; */
             }
         </style>
-        <link href="css/tablecloth.css" rel="stylesheet" type="text/css" media="screen" />
 
+        <link href="css/tablecloth.css" rel="stylesheet" type="text/css" media="screen" />
+        <script type="text/javascript">
+            function submitform(){
+                var name= document.getElementById("name").value;
+              
+                var bool = validateForm();
+                if(bool){
+                    $.post('action/permissionaction.jsp',{ action : "units", name : name}, function(data){
+                        alert(data);
+                    })
+                }else{
+                    alert("Permission field cannot be empty");
+                }
+            }
+            
+            function updateUnit(name,id){
+                var uname = document.getElementById(name).value;
+                var uid = document.getElementById(id).value;
+               
+                $.post('action/permissionaction.jsp', { action : "edit", uname : uname, uid : uid}, function(data) {
+                    alert(data);
+                    $('#results').html(data).hide().slideDown('slow');
+                } );
+            }
+            
+            function deleteUnit(id){
+                var id = document.getElementById(id).value;
+                // var roledescription = document.getElementById("roledescription").value;
+                var con = confirm("Are You Sure You Want Delete This Item");
+                if (con ==true)
+                {
+                    $.post('action/permissionaction.jsp', { action : "delete", id : id}, function(data) {
+                        alert(data);
+                        $('#results').html(data).hide().slideDown('slow');
+                    } );
+                }
+                else 
+                {
+                    alert("Delete Was Cancelled!");
+                    //return;
+                }
+            }
+        </script>
     </head>
 
     <body data-spy="scroll" data-target=".subnav" data-offset="50">
@@ -70,7 +111,7 @@
             <div class="navbar-inner">
                 <div class="container">
                     <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a>
-                    <a class="brand" href="#"><img src="images/logo.png" width="200px;" /></a>
+                    <a class="brand" href="../"><img src="images/logo.png" width="200px;" /></a>
 
                     <div style="margin-top: 10px;" class="nav-collapse">
                         <ul class="nav pull-right">
@@ -98,7 +139,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -145,7 +186,9 @@
             <section style="margin-top: -30px;" id="dashboard">
 
                 <!-- Headings & Paragraph Copy -->
+                <div class="row">
 
+<<<<<<< HEAD
 
 
                 <%if (session.getAttribute("lasterror") != null) {%>
@@ -157,20 +200,30 @@
                         session.removeAttribute("lasterror");
                     }%>
 
+=======
+                    <%
+
+                        HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+
+                        HMSHelper mgr = new HMSHelper();
+
+                        List itmss = mgr.listPermissions();
+>>>>>>> latest release v 1.2.0
 
 
-                <div class="row">
 
 
-                    <%@include file="widgets/leftsidebar.jsp" %>
+                    %>     
 
-                    <div style="margin-top: 0px; "class="span12 offset3 content1 hide">
+                    <div style="margin-top: 0px; text-align: center;" class="span12 offset3 content1 hide">
 
                         <div style="padding-bottom: 80px;" class="span9 thumbnail well content">
                             <ul style="margin-left: 0px;" class="breadcrumb">
                                 <li>
-                                    <a> <i class="icon-home"></i> Front Desk</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="listpatients.jsp">List Patients</a><br/>
+                                    <h4>Sign in</h4>
+                                    <br/>
 
+<<<<<<< HEAD
                                 </li>
                             </ul>
 
@@ -566,12 +619,63 @@
                                         <% }
 
                                         %>
+=======
 
+                                </li>
+
+                            </ul>
+>>>>>>> latest release v 1.2.0
+
+                            <form action="action/login.jsp" method="post" name="items" >
+
+                                <fieldset>
+
+                                    <div class="control-group">
+                                        <label class="control-label" for="input01"> Username </label>
+                                        <div class="controls">
+                                            <input type="text" name="username" id="name">
+                                            <p class="help-block"></p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input01"> Password </label>
+                                        <div class="controls">
+                                            <input type="password" name="password" id="name">
+                                            <p class="help-block"></p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input01"> Unit </label>
+
+                                        <select name="unit">
+                                            <% List list = mgr.listWard();
+                                                for (int i = 0; i < list.size(); i++) {
+                                                    Ward ward = (Ward) list.get(i);
+                                            %>
+                                            <option value="<%=ward.getType()%>_<%=ward.getWardid()%>"><%=ward.getWardname()%></option>
+                                            <%}
+                                                List lists = mgr.listUnits();
+
+                                                for (int r = 0; r < lists.size(); r++) {
+                                                    Units unit = (Units) lists.get(r);
+                                            %>  
+                                            <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option>
+                                            <%}
+                                                List ls = mgr.listConRooms();
+                                                for(int x = 0 ; x < ls.size(); x++){
+                                                    Consultingrooms conroom = (Consultingrooms) ls.get(x);
+                                            %>
+                                            <option value="<%=conroom.getType()%>_<%=conroom.getConsultingroomid()%>"><%=conroom.getConsultingroom()%></option>
+                                                    <%}%>
                                     </select>
 
+<<<<<<< HEAD
+=======
+                                    <p class="help-block"></p>
+>>>>>>> latest release v 1.2.0
                                 </div>
-                            </div>
 
+<<<<<<< HEAD
                             <div class="control-group">
                                 <label for="coperateid" class="control-label" >Corporate ID</label>
                                 <div class="controls">
@@ -635,12 +739,21 @@
                     <button type="submit" name ="action" value="patient" class="btn btn-danger btn-large submit_button">
                         <i class="icon-ok icon-white"></i> Save changes
                     </button>
+=======
+                                <div class="form-actions">
 
-                </div>
+                                    <button class="btn btn-danger btn-large" type="submit" value="login" name="action">
+                                        <i class="icon-arrow-right icon-white"> </i> Sign Up 
+                                    </button>
 
-            </form>
-        </div>
+                                </div>
+                            </fieldset>
+                        </form>
+>>>>>>> latest release v 1.2.0
 
+
+
+<<<<<<< HEAD
         <div style="display: none;" id="dialog2" title="Patient Search">
 
             <form class="form-horizontal" action="searchresults.jsp" method="post">
@@ -991,3 +1104,162 @@
 
     </body>
 </html>
+=======
+                    </div>
+
+                </div>
+                <div class="clearfix"></div>
+
+            </div>
+
+
+        </section>
+
+        <footer style="display: none; margin-top: 50px;" class="footer">
+            <p style="text-align: center" class="pull-right">
+                <img src="images/logo.png" width="100px;" />
+            </p>
+        </footer>
+
+    </div><!-- /container -->    
+
+</div>
+</div>
+<!--end static dialog-->
+
+<!-- Le javascript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="js/jquery.js"></script>
+<script src="js/bootstrap-dropdown.js"></script>
+<script src="js/bootstrap-scrollspy.js"></script>
+<script src="js/bootstrap-collapse.js"></script>
+<script src="js/bootstrap-tooltip.js"></script>
+<script src="js/bootstrap-popover.js"></script>
+<script src="js/application.js"></script>
+
+<script type="text/javascript" src="js/jquery-ui-1.8.16.custom.min.js"></script>
+
+<script type="text/javascript" src="third-party/jQuery-UI-Date-Range-Picker/js/date.js"></script>
+<script type="text/javascript" src="third-party/jQuery-UI-Date-Range-Picker/js/daterangepicker.jQuery.js"></script>
+
+<script src="third-party/wijmo/jquery.mousewheel.min.js" type="text/javascript"></script>
+<script src="third-party/wijmo/jquery.bgiframe-2.1.3-pre.js" type="text/javascript"></script>
+<script src="third-party/wijmo/jquery.wijmo-open.1.5.0.min.js" type="text/javascript"></script>
+
+<script src="third-party/jQuery-UI-FileInput/js/enhance.min.js" type="text/javascript"></script>
+<script src="third-party/jQuery-UI-FileInput/js/fileinput.jquery.js" type="text/javascript"></script>
+
+<script type="text/javascript" src="js/tablecloth.js"></script>
+<script type="text/javascript" src="js/demo.js"></script>
+
+<!--initiate accordion-->
+<script type="text/javascript">
+    $(function() {
+
+        var menu_ul = $('.menu > li > ul'), menu_a = $('.menu > li > a');
+
+        menu_ul.hide();
+
+        $(".menu").fadeIn();
+        $(".content1").fadeIn();
+        $(".navbar").fadeIn();
+        $(".footer").fadeIn();
+        $(".subnav").fadeIn();
+        $(".progress1").hide();
+
+        menu_a.click(function(e) {
+            e.preventDefault();
+            if(!$(this).hasClass('active')) {
+                menu_a.removeClass('active');
+                menu_ul.filter(':visible').slideUp('normal');
+                $(this).addClass('active').next().stop(true, true).slideDown('normal');
+            } else {
+                $(this).removeClass('active');
+                $(this).next().stop(true, true).slideUp('normal');
+            }
+        });
+
+    });
+    
+    
+    
+    function validateForm()
+    {
+        var x=document.forms["items"]["name"].value;
+        if (x==null || x=="")
+        {
+            // alert("Item must be filled out");
+            return false;
+        }
+        /* var x=document.forms["edit"]["uname"].value;
+        if (x==null || x=="")
+        {
+            // alert("Item must be filled out");
+            return false;
+        }*/
+        
+        return true;
+    }
+    function todaysdate()
+    {
+        var currentDate = new Date()
+        var day = currentDate.getDate()
+        var month = currentDate.getMonth() + 1
+        var year = currentDate.getFullYear()
+        var dat=(" " + year + "-" + month + "-" + day )
+        //document.write(dat)
+        // alert("Todays Date is "+dat)
+        return dat; 
+   
+ 
+    }
+</script>
+<% for (int i = 0;
+            i < itmss.size();
+            i++) {
+        Permission vst = (Permission) itmss.get(i);
+%>
+
+
+<script type="text/javascript">
+   
+                      
+    $("#<%= vst.getPermissionid()%>_dialog").dialog({
+        autoOpen : false,
+        width : 1000,
+        modal :true
+
+    });
+    
+    $("#<%= vst.getPermissionid()%>_adddrug_dialog").dialog({
+        autoOpen : false,
+        width : 1000,
+        modal :true
+
+    });
+    
+   
+    
+    $("#<%= vst.getPermissionid()%>_link").click(function(){
+      
+        $("#<%=vst.getPermissionid()%>_dialog").dialog('open');
+    
+    })
+  
+    
+    $("#<%= vst.getPermissionid()%>_adddrug_link").click(function(){
+        alert("");
+        $("#<%=vst.getPermissionid()%>_adddrug_dialog").dialog('open');
+        
+    })
+   
+    
+</script>
+
+
+
+<% }%>
+</body>
+</html>
+>>>>>>> latest release v 1.2.0

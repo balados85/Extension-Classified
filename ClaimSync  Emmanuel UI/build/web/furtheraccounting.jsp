@@ -7,6 +7,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
     <head>
         <meta charset="utf-8">
@@ -66,7 +71,7 @@
             //get current date time with Date()
             Date date = new Date();
             //System.out.println(dateFormat.format(date));
-            List visits = mgr.listSecondaryConsultation("Accounts");
+            List visits = mgr.listSecondaryConsultation((String)session.getAttribute("unit"));
             List treatments = null;
             // for (int i = 0; i < visits.size(); i++) {
             //   Visitationtable visit = (Visitationtable) visits.get(i);
@@ -116,7 +121,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -192,7 +197,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% for (int i = 0; i < visits.size(); i++) {
+                                    <% if(visits != null){
+                                    for (int i = 0; i < visits.size(); i++) {
                                             Visitationtable vst = (Visitationtable) visits.get(i);
                                     %>
                                     <tr>
@@ -207,7 +213,9 @@
                                                     </ul>
                                                     <%
                                                         Double total = 0.0;
-                                                        if (vst.getPreviouslocstion().equals("Pharmacy")) {%>
+                                                        String previouslocation = vst.getPreviouslocstion();
+                                                        String[] previouslocations = previouslocation.split("_");
+                                                        if (previouslocations[0].equals("pharmacy")) {%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -321,7 +329,9 @@
                                                         </div>
                                                     </form>
                                                     <%}%>
-                                                    <%if (vst.getPreviouslocstion().equals("Laboratory")) {%>
+                                                    <%String prev = vst.getPreviouslocstion();
+                                                        String[] prevs = prev.split("_");
+                                                        if (prevs[0].equals("lab")) {%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -454,7 +464,9 @@
                                                         </div>
                                                     </form>
                                                     <%}
-                                                        if (vst.getPreviouslocstion().equals("Records")) {%>
+                                                        String rec = vst.getPreviouslocstion();
+                                                        String[] recs = rec.split("_");
+                                                        if (recs[0].equals("records")) {%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -528,7 +540,7 @@
                                         <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%></h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
                                             data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td> </tr> <tr>
                                             <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> "> <%=vst.getPatientid()%>   </td>
-                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%></td>
+                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%>, <%=mgr.getPatientByID(vst.getPatientid()).getMidname()%> <%=mgr.getPatientByID(vst.getPatientid()).getLname()%></td>
                                         <td><%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%> </td>
 
                                         <td><%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td>
@@ -541,7 +553,7 @@
                                                 <i class="icon-white icon-check"></i> Receipt
                                             </button></td>
                                     </tr>
-                                    <%}%> 
+                                    <%}}%> 
 
                                 </tbody>
                             </table>

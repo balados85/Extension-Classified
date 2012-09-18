@@ -1,16 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
-<!-- Generated Sep 12, 2012 4:07:19 PM by Hibernate Tools 3.2.1.GA -->
+<!-- Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA -->
 <hibernate-mapping>
     <class name="entities.Stafftable" table="stafftable" catalog="extended">
         <id name="staffid" type="string">
             <column name="staffid" />
             <generator class="assigned" />
         </id>
-        <property name="firstname" type="string">
-            <column name="firstname" not-null="true" />
-        </property>
         <property name="lastname" type="string">
             <column name="lastname" not-null="true" />
         </property>
@@ -20,14 +17,20 @@
         <property name="ssn" type="string">
             <column name="ssn" />
         </property>
-        <property name="dob" type="date">
-            <column name="dob" length="10" not-null="true" />
+        <property name="gender" type="string">
+            <column name="gender" length="10" />
+        </property>
+        <property name="email" type="string">
+            <column name="email" length="100" />
+        </property>
+        <property name="dob" type="string">
+            <column name="dob" />
         </property>
         <property name="placeofbirth" type="string">
-            <column name="placeofbirth" not-null="true" />
+            <column name="placeofbirth" />
         </property>
-        <property name="yearofemployment" type="date">
-            <column name="yearofemployment" length="0" not-null="true" />
+        <property name="yearofemployment" type="string">
+            <column name="yearofemployment" length="4" />
         </property>
         <property name="role" type="int">
             <column name="role" not-null="true" />
@@ -39,10 +42,10 @@
             <column name="address" />
         </property>
         <property name="contact" type="string">
-            <column name="contact" not-null="true" />
+            <column name="contact" />
         </property>
         <property name="nextofkin" type="string">
-            <column name="nextofkin" not-null="true" />
+            <column name="nextofkin" />
         </property>
         <property name="nextofkincontact" type="string">
             <column name="nextofkincontact" />

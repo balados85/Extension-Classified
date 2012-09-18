@@ -8,6 +8,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
     <head>
         <meta charset="utf-8">
@@ -65,7 +70,8 @@
                var t =  validateForm();
                if(t){
                 var name = document.getElementById("name").value;
-                $.post('action/unitaction.jsp', { action : "units", name : name}, function(data) {
+                var type = document.getElementById("type").value;
+                $.post('action/unitaction.jsp', { action : "units", name : name, type : type}, function(data) {
                     alert(data);
                     $('#results').html(data).hide().slideDown('slow');
                 } );
@@ -147,7 +153,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -233,6 +239,21 @@
                                         <label class="control-label" for="input01"> Unit Name: </label>
                                         <div class="controls">
                                             <input type="text" name="name" id="name">
+                                            <p class="help-block"></p>
+                                        </div>
+                                    </div>
+                                    <div class="control-group">
+                                        <label class="control-label" for="input01"> Unit Type </label>
+                                        <div class="controls">
+                                            <select name="type" id="type">
+                                                <option value="T">Select</option>
+                                                <option value="lab">Laboratories</option>
+                                                <option value="pharmacy">Pharmacies</option>
+                                                <option value="records">Records/Front Desk</option>
+                                                <option value="vitals">Nurses Station</option>
+                                                <option value="account">Account Offices</option>
+                                                
+                                            </select>
                                             <p class="help-block"></p>
                                         </div>
                                     </div>
@@ -395,6 +416,10 @@
         if (x==null || x=="")
         {
            // alert("Item must be filled out");
+            return false;
+        }
+        var y=document.forms["items"]["type"].value;
+        if (y=="T"){
             return false;
         }
         var x=document.forms["edit"]["uname"].value;

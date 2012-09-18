@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 12, 2012 4:07:18 PM by Hibernate Tools 3.2.1.GA
+// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
 
 
 
@@ -11,12 +11,14 @@ public class Consultingrooms  implements java.io.Serializable {
 
      private Integer consultingroomid;
      private String consultingroom;
+     private String type;
 
     public Consultingrooms() {
     }
 
-    public Consultingrooms(String consultingroom) {
+    public Consultingrooms(String consultingroom, String type) {
        this.consultingroom = consultingroom;
+       this.type = type;
     }
    
     public Integer getConsultingroomid() {
@@ -32,6 +34,13 @@ public class Consultingrooms  implements java.io.Serializable {
     
     public void setConsultingroom(String consultingroom) {
         this.consultingroom = consultingroom;
+    }
+    public String getType() {
+        return this.type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
     }
 
 

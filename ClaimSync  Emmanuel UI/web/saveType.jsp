@@ -8,12 +8,18 @@
 
 
 
-<%@page import="entities.Itemtype"%>
-<%@page import="entities.itemHelper"%>
-<%@page import="entities.HibernateUtil"%>
+<%@page import="entities.*"%>
+
+<%@page import="helper.HibernateUtil"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
 <% try {
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
        
@@ -30,7 +36,7 @@ System.out.println(itemType+"" );
         System.out.println("ere");
            
 
-           itemHelper its = new itemHelper();
+           HMSHelper its = new HMSHelper();
             Itemtype it = null;
             
 

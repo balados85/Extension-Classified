@@ -6,12 +6,15 @@
 
 
 <%@page import="helper.HibernateUtil"%>
-<%@page import="entities.Post"%>
-<%@page import="entities.ItemsTable"%>
-<%@page import="entities.HMSHelper"%>
+<%@page import="entities.*"%>
+
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <!DOCTYPE html>
 <%
     try {

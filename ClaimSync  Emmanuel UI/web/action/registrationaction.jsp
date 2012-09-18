@@ -11,6 +11,11 @@
 <%@page import="entities.*,helper.HibernateUtil"%>
 <!DOCTYPE html>
 <% try {
+    Users current = (Users) session.getAttribute("staff");
+            if(current == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         // HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
         Session sess = HibernateUtil.getSessionFactory().getCurrentSession();
         sess.beginTransaction();
@@ -137,7 +142,7 @@
             }
 
 
-            f = mgr.createFolder(p.getPatientid(), p.getLname().substring(0, 1) + "-0001", "Records", "Records");
+            f = mgr.createFolder(p.getPatientid(), p.getLname().substring(0, 1) + "-0001", (String)session.getAttribute("unit"), (String)session.getAttribute("unit"));
             if (f == null) {
                 session.setAttribute("lasterror", "patient folder could not be created delete patient's details and please try again");
                 response.sendRedirect("../index.jsp");

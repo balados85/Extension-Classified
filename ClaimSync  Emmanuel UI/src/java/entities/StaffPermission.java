@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 12, 2012 4:07:18 PM by Hibernate Tools 3.2.1.GA
+// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
 
 
 
@@ -9,21 +9,38 @@ package entities;
 public class StaffPermission  implements java.io.Serializable {
 
 
-     private StaffPermissionId id;
+     private Integer id;
+     private String staffid;
+     private int permissionid;
 
     public StaffPermission() {
     }
 
-    public StaffPermission(StaffPermissionId id) {
-       this.id = id;
+    public StaffPermission(String staffid, int permissionid) {
+       this.staffid = staffid;
+       this.permissionid = permissionid;
     }
    
-    public StaffPermissionId getId() {
+    public Integer getId() {
         return this.id;
     }
     
-    public void setId(StaffPermissionId id) {
+    public void setId(Integer id) {
         this.id = id;
+    }
+    public String getStaffid() {
+        return this.staffid;
+    }
+    
+    public void setStaffid(String staffid) {
+        this.staffid = staffid;
+    }
+    public int getPermissionid() {
+        return this.permissionid;
+    }
+    
+    public void setPermissionid(int permissionid) {
+        this.permissionid = permissionid;
     }
 
 

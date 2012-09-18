@@ -69,6 +69,11 @@
             //System.out.println(dateFormat.format(date));
             List visits = mgr.listUnitVisitations("Laboratory", dateFormat.format(date));
             List treatments = null;
+            Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
             // for (int i = 0; i < visits.size(); i++) {
             //   Visitationtable visit = (Visitationtable) visits.get(i);
         %>
@@ -110,9 +115,8 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
-
                                 </ul>
 
                             </li>

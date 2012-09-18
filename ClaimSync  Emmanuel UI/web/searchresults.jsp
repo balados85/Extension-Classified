@@ -6,6 +6,12 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
         <meta name="author" content="">
+        <% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
         <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
         <%
             HMSHelper mgr = new HMSHelper();
@@ -148,7 +154,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -306,19 +312,23 @@
 
                 <form class="span3" style="text-align: center; margin-left: 25%;"  action="action/forwardaction.jsp" method="post">
                     Send <b><%= p.getFname()%></b> to
-                    <select name="unitid" onchange="updateView()">
-                        <%
-                            List units = mgr.listUnits();
+                     <div class="control-group">
+                                        <label class="control-label" for="input01"> Unit </label>
 
-                            for (int x = 0; x < units.size(); x++) {
-                                Units unit = (Units) units.get(x);
-                                //  if(!unit.getUnitname().equals("OPD")){
-%>
-                        <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option>
-                        <% }
-                            //}
-%>
-                    </select>
+                                        <select name="unitid" onchange="updateView()">
+                                            <% 
+                                                List lists = mgr.listUnits();
+
+                                                for (int r = 0; r < lists.size(); r++) {
+                                                    Units unit = (Units) lists.get(r);
+                                            %>  
+                                            <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option>
+                                            <%}
+                                               %>
+                                    </select>
+
+                                    <p class="help-block"></p>
+                                </div>
                     <br />
                     <input type="hidden" name="patient" value="<%=p.getPatientid()%>"/>
                     <input type="hidden" name="contype" id="contype" value=""/>
@@ -586,19 +596,24 @@
 
             <form class="span3" style="text-align: center; margin-left: 25%; "  action="action/forwardaction.jsp" method="post">
                 Send <b><%= ppp.getFname()%></b> to
-                <select name="unitid" onchange="updateView()">
-                    <%
-                        List units = mgr.listUnits();
+                 <div class="control-group">
+                                        <label class="control-label" for="input01"> Unit </label>
 
-                        for (int x = 0; x < units.size(); x++) {
-                            Units unit = (Units) units.get(x);
-                            //if(unit.getUnitname().equals("OPD")){
-%>
-                    <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option>
-                    <% //}
-                        }
-                    %>
-                </select>
+                                        <select name="unitid" onchange="updateView()">
+                                            <% 
+                                                List lists = mgr.listUnits();
+
+                                                for (int r = 0; r < lists.size(); r++) {
+                                                    Units unit = (Units) lists.get(r);
+                                            %>  
+                                            <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option>
+                                            <%}
+                                               %>
+                                    </select>
+
+                                    <p class="help-block"></p>
+                                </div>
+                
                 <br />
                 <input type="hidden" name="patient" value="<%=ppp.getPatientid()%>"/>
 

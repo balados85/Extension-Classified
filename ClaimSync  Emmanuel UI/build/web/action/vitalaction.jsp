@@ -5,6 +5,11 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil,org.hibernate.Session,java.util.Date" %>
 <% try {
+    Users current = (Users) session.getAttribute("staff");
+            if(current == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         Session sess = HibernateUtil.getSessionFactory().getCurrentSession();
         sess.beginTransaction();
         HMSHelper mgr = new HMSHelper();
@@ -29,9 +34,9 @@
                 return;
             }
             
-            mgr.updateVisitation(patientid, Integer.parseInt(id), forward,content,mgr.getPatientFolder(patientid).getStatus());
+            mgr.updateVisitation(patientid, Integer.parseInt(id), forward,content,(String)session.getAttribute("unit"));
             
-            mgr.updateFolderLocation(mgr.getPatientFolder(patientid).getStatus(),forward, patientid);
+            mgr.updateFolderLocation((String)session.getAttribute("unit"),forward, patientid);
             
             session.setAttribute("lasterror", "Vital Successfully");
             response.sendRedirect("../opd.jsp");

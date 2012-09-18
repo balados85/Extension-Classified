@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 12, 2012 4:07:18 PM by Hibernate Tools 3.2.1.GA
+// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
 
 
 
@@ -13,14 +13,28 @@ public class Appoint  implements java.io.Serializable {
      private String patientId;
      private String doctorId;
      private String content;
+     private String start;
+     private String title;
+     private String allday;
+     private String end;
+     private boolean honored;
 
     public Appoint() {
     }
 
-    public Appoint(String patientId, String doctorId, String content) {
+	
+    public Appoint(boolean honored) {
+        this.honored = honored;
+    }
+    public Appoint(String patientId, String doctorId, String content, String start, String title, String allday, String end, boolean honored) {
        this.patientId = patientId;
        this.doctorId = doctorId;
        this.content = content;
+       this.start = start;
+       this.title = title;
+       this.allday = allday;
+       this.end = end;
+       this.honored = honored;
     }
    
     public Integer getId() {
@@ -50,6 +64,41 @@ public class Appoint  implements java.io.Serializable {
     
     public void setContent(String content) {
         this.content = content;
+    }
+    public String getStart() {
+        return this.start;
+    }
+    
+    public void setStart(String start) {
+        this.start = start;
+    }
+    public String getTitle() {
+        return this.title;
+    }
+    
+    public void setTitle(String title) {
+        this.title = title;
+    }
+    public String getAllday() {
+        return this.allday;
+    }
+    
+    public void setAllday(String allday) {
+        this.allday = allday;
+    }
+    public String getEnd() {
+        return this.end;
+    }
+    
+    public void setEnd(String end) {
+        this.end = end;
+    }
+    public boolean isHonored() {
+        return this.honored;
+    }
+    
+    public void setHonored(boolean honored) {
+        this.honored = honored;
     }
 
 

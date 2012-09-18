@@ -8,6 +8,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -74,14 +79,14 @@
                                         for (int i = 0; i < labresults.size(); i++) {
                                             Laborders laborders = (Laborders) labresults.get(i);
                                             if (!laborders.getViewed() && laborders.isDone()) {
-laborderid = laborders.getOrderid();
+                                                laborderid = laborders.getOrderid();
 
                                 %>
 
                                 <tr>
                                     <td><%=laborders.getPatientid()%></td>
-                                    <td><%=mgr.getPatientByID(laborders.getPatientid()).getFname()%></td>
-                                    <td><%=laborders.getFromdoc()%></td>
+                                    <td><%=mgr.getPatientByID(laborders.getPatientid()).getFname()%>, <%=mgr.getPatientByID(laborders.getPatientid()).getMidname()%> <%=mgr.getPatientByID(laborders.getPatientid()).getLname()%></td>
+                                    <td><%=mgr.getStafftableByid(laborders.getFromdoc()).getLastname()%> <%=mgr.getStafftableByid(laborders.getFromdoc()).getLastname() %></td>
                                     <td><%=laborders.getOrderdate()%></td>
                                     <td><%=laborders.getDonedate()%></td>
                                     <td>

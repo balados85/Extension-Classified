@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 12, 2012 4:07:18 PM by Hibernate Tools 3.2.1.GA
+// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
 
 
 
@@ -11,12 +11,14 @@ public class Units  implements java.io.Serializable {
 
      private Integer unitid;
      private String unitname;
+     private String type;
 
     public Units() {
     }
 
-    public Units(String unitname) {
+    public Units(String unitname, String type) {
        this.unitname = unitname;
+       this.type = type;
     }
    
     public Integer getUnitid() {
@@ -32,6 +34,13 @@ public class Units  implements java.io.Serializable {
     
     public void setUnitname(String unitname) {
         this.unitname = unitname;
+    }
+    public String getType() {
+        return this.type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
     }
 
 

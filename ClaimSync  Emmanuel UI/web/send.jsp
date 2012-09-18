@@ -9,12 +9,18 @@
 
 
 
-<%@page import="entities.Receive"%>
-<%@page import="entities.itemHelper"%>
+<%@page import="entities.*"%>
+
 <%@page import="java.util.Date"%>
 <%@page import="java.text.SimpleDateFormat"%>
 <%@page import="java.text.DateFormat"%>
-<%@page import="entities.HibernateUtil"%>
+<%@page import="helper.HibernateUtil"%>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
 <style type="text/css">
     form{
 
@@ -129,7 +135,7 @@
                 String receiver = request.getParameter("receiver");
                 String transactionId = request.getParameter("transactionId");
 
-                itemHelper its = new itemHelper();
+                HMSHelper its = new HMSHelper();
                 Receive it = null;
 
 

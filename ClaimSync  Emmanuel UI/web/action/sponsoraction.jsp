@@ -5,7 +5,12 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
-            HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
+           Users current = (Users) session.getAttribute("staff");
+            if(current == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
+    HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
             if ("sponsor".equals(request.getParameter("action"))) {
                 String sponsorName = request.getParameter("sponsorname");

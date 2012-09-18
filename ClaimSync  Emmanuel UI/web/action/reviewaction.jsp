@@ -5,6 +5,11 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
+    Users current = (Users) session.getAttribute("staff");
+            if(current == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("../index.jsp");
+            }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
         if ("Forward".equals(request.getParameter("action"))) {
@@ -21,10 +26,10 @@
                 
                 HMSHelper mgr = new HMSHelper();
                 String previous = mgr.getPatientFolder(patientid).getStatus();
-                mgr.updateLaborders(orderid, "");
+                mgr.updateLaborders(orderid, current.getStaffid());
                 mgr.updateVisitation(visitid);
-                mgr.updateFolderLocation(previous, "Room 1", patientid);
-                mgr.updateVisitationStatus(visitid, "Room 1", previous);
+                mgr.updateFolderLocation(previous, (String)session.getAttribute("unit"), patientid);
+                mgr.updateVisitationStatus(visitid, (String)session.getAttribute("unit"), previous);
            
                 // description = 
             } catch (NumberFormatException e) {

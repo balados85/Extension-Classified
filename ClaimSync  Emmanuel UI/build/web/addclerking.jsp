@@ -7,6 +7,11 @@
 <%@page import="helper.HibernateUtil"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -70,7 +75,8 @@
                         answer = answer+answers[i].value+"-";
                         // alert(answers[i]);
                     }
-                }   
+                } 
+              
                 // var con = confirm("Are You Sure You Want Delete This Item");
                 //alert(answer);
                 var t = validateForm();
@@ -185,8 +191,8 @@
                                     </li>
                                     <li class="divider"></li>
 
-                                    <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                   <li>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>

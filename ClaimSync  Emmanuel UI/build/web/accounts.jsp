@@ -60,14 +60,21 @@
         <link href="css/tablecloth.css" rel="stylesheet" type="text/css" media="screen" />
 
         <%
+            Users user = (Users) session.getAttribute("staff");
+            if (user == null) {
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
             HMSHelper mgr = new HMSHelper();
             DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
             //Patient p = (Patient)session.getAttribute("patient");
             //get current date time with Date()
             Date date = new Date();
             //System.out.println(dateFormat.format(date));
-            List visits = mgr.listUnitVisitations("Accounts", dateFormat.format(date));
+
+            List visits = mgr.listUnitVisitations((String) session.getAttribute("unit"), dateFormat.format(date));
             List treatments = null;
+
             // for (int i = 0; i < visits.size(); i++) {
             //   Visitationtable visit = (Visitationtable) visits.get(i);
         %>
@@ -116,7 +123,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -188,12 +195,13 @@
                                         <th> Sponsor </th>
                                         <th> Membership ID </th>
                                         <th> Request Date </th>
-                                        <th></th>
+                                        <th><%=(String) session.getAttribute("unit")%></th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% for (int i = 0; i < visits.size(); i++) {
-                                            Visitationtable vst = (Visitationtable) visits.get(i);
+                                    <% if (visits != null) {
+                                            for (int i = 0; i < visits.size(); i++) {
+                                                Visitationtable vst = (Visitationtable) visits.get(i);
                                     %>
                                     <tr>
                                         <td colspan="7">
@@ -207,7 +215,9 @@
                                                     </ul>
                                                     <%
                                                         Double total = 0.0;
-                                                        if (vst.getPreviouslocstion().equals("Pharmacy")) {%>
+                                                        String previouslocation = vst.getPreviouslocstion();
+                                                        String[] previouslocations = previouslocation.split("_");
+                                                        if (previouslocations[0].equals("pharmacy")) {%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -228,12 +238,10 @@
 
                                                                     for (int r = 0; r < ptreatmentss.size(); r++) {
                                                                         Patienttreatment ptPatienttreatments = (Patienttreatment) ptreatmentss.get(r);
-                                                                       // if (ptPatienttreatments.getDispensed().equalsIgnoreCase("No")) {
+                                                                        // if (ptPatienttreatments.getDispensed().equalsIgnoreCase("No")) {
                                                                 %>
                                                                 <tr>
-                                                                    <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%> </h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                                                        data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%></td> </tr> <tr>
-                                                                        <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> ">
+                                                                    <td>
                                                                         <%=mgr.getTreatment(ptPatienttreatments.getTreatmentid()).getTreatment()%> </td>
                                                                     <td><%=ptPatienttreatments.getQuantity()%> </td>
                                                                     <td><%=ptPatienttreatments.getPrice()%> </td>
@@ -249,42 +257,42 @@
                                                                         <% total = total + (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice());%>
 
                                                                     <%}
-                                                                            if (ptPatienttreatments.getDispensed().equals("No")) {%>
+                                                                        if (ptPatienttreatments.getDispensed().equals("No")) {%>
                                                                     <td>Cannot Afford</td>
                                                                     <td>
                                                                         <%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%>
                                                                     </td>
                                                                     <td></td>
-                                                           
-                                                            <%}
-                                                                            if (ptPatienttreatments.getDispensed().equals("paid")) {%>
-                                                                            <td><%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%></td>
-                                                                             <td>0</td>
-                                                                             <td>Awaiting Dispensing</td>
-                                                            <%}
-                                                                            if (ptPatienttreatments.getDispensed().equals("Dispensed")) {%>
-                                                                            <td>
-                                                                               <%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%> 
-                                                                            </td>
-                                                                            <td>0</td>
-                                                                            <td>Dispensed</td>
-                                                            <%}%>
-                                                            
 
-                                                            </tr>
+                                                                    <%}
+                                                                        if (ptPatienttreatments.getDispensed().equals("paid")) {%>
+                                                                    <td><%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%></td>
+                                                                    <td>0</td>
+                                                                    <td>Awaiting Dispensing</td>
+                                                                    <%}
+                                                                        if (ptPatienttreatments.getDispensed().equals("Dispensed")) {%>
+                                                                    <td>
+                                                                        <%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%> 
+                                                                    </td>
+                                                                    <td>0</td>
+                                                                    <td>Dispensed</td>
+                                                                    <%}%>
 
-                                                            <%//}
-                                                                }
-                                                            %>
-                                                            <tr>
-                                                                <td>Total Cost</td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td></td>
-                                                                <td><%=total%></td>
-                                                            </tr>
+
+                                                                </tr>
+
+                                                                <%//}
+                                                                    }
+                                                                %>
+                                                                <tr>
+                                                                    <td>Total Cost</td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td><%=total%></td>
+                                                                </tr>
                                                             </tbody>
 
                                                         </table>
@@ -301,13 +309,13 @@
                                                                     for (int j = 0; j < units.size(); j++) {
                                                                         Units unit = (Units) units.get(j);
                                                                 %>
-                                                                <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
+                                                                <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option> 
                                                                 <% }
                                                                     List wards = mgr.listWard();
                                                                     for (int j = 0; j < wards.size(); j++) {
                                                                         Ward ward = (Ward) wards.get(j);
                                                                 %>
-                                                                <option value="<%=ward.getWardname()%>"><%=ward.getWardname()%></option> 
+                                                                <option value="<%=ward.getType()%>_<%=ward.getWardid()%>"><%=ward.getWardname()%></option> 
                                                                 <% }
 
                                                                 %>
@@ -321,7 +329,10 @@
                                                         </div>
                                                     </form>
                                                     <%}%>
-                                                    <%if (vst.getPreviouslocstion().equals("Laboratory")) {%>
+                                                    <%
+                                                        String prev = vst.getPreviouslocstion();
+                                                        String[] prevs = prev.split("_");
+                                                        if (prevs[0].equals("lab")) {%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -349,7 +360,7 @@
                                                                     <td><%=patientinvestigation.getQuantity()%> </td>
                                                                     <td><%=patientinvestigation.getPrice()%></td>
                                                                     <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                                double tt = patientinvestigation.getPrice() * qty;%>
+                                                                        double tt = patientinvestigation.getPrice() * qty;%>
                                                                     <td><%=tt%></td>
                                                                     <td><input type="text" name="nm_<%=patientinvestigation.getId()%>" readonly="readonly"/></td>
                                                                     <td><%=tt - patientinvestigation.getAmountpaid()%></td>
@@ -357,7 +368,7 @@
                                                                 </tr>
 
                                                                 <% }
-                                                                if (patientinvestigation.getPerformed().equalsIgnoreCase("paid")) {%>
+                                                                    if (patientinvestigation.getPerformed().equalsIgnoreCase("paid")) {%>
                                                                 <tr>
 
                                                                     <td >
@@ -366,7 +377,7 @@
                                                                     <td><%=patientinvestigation.getQuantity()%> </td>
                                                                     <td><%=patientinvestigation.getPrice()%></td>
                                                                     <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                                double tt = patientinvestigation.getPrice() * qty;%>
+                                                                        double tt = patientinvestigation.getPrice() * qty;%>
                                                                     <td><%=tt%></td>
                                                                     <td>Paid</td>
                                                                     <td><%=tt - patientinvestigation.getAmountpaid()%></td>
@@ -374,7 +385,7 @@
 
                                                                 </tr>
                                                                 <%}
-                                                                if (patientinvestigation.getPerformed().equalsIgnoreCase("Afford")) {%>
+                                                                    if (patientinvestigation.getPerformed().equalsIgnoreCase("Afford")) {%>
                                                                 <tr>
                                                             <input type="hidden" name="vid[]" value="<%=patientinvestigation.getId()%>"/>
                                                             <td >
@@ -400,14 +411,14 @@
                                                                 <td><%=patientinvestigation.getQuantity()%> </td>
                                                                 <td><%=patientinvestigation.getPrice()%></td>
                                                                 <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                                double tt = patientinvestigation.getPrice() * qty;%>
+                                                                    double tt = patientinvestigation.getPrice() * qty;%>
                                                                 <td><%=tt%></td>
                                                                 <td><%=patientinvestigation.getAmountpaid()%></td>
                                                                 <td><%=tt - patientinvestigation.getAmountpaid()%></td>
                                                                 <td>Performed</td>
                                                             </tr>
                                                             <%   }
-                                                                 }%> 
+                                                                }%> 
                                                             <tr>
                                                                 <td>Total</td>
                                                                 <td></td>
@@ -434,14 +445,24 @@
                                                                     for (int j = 0; j < units.size(); j++) {
                                                                         Units unit = (Units) units.get(j);
                                                                 %>
-                                                                <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
+                                                                <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option> 
                                                                 <% }
                                                                     List wards = mgr.listWard();
                                                                     for (int j = 0; j < wards.size(); j++) {
                                                                         Ward ward = (Ward) wards.get(j);
                                                                 %>
-                                                                <option value="<%=ward.getWardname()%>"><%=ward.getWardname()%></option> 
+                                                                <option value="<%=ward.getType()%>_<%=ward.getType()%>"><%=ward.getWardname()%></option> 
                                                                 <% }
+                                                                    List consultingrooms = mgr.listConRooms();
+                                                                    for (int j = 0; j < consultingrooms.size(); j++) {
+                                                                        Consultingrooms consultingroom = (Consultingrooms) consultingrooms.get(j);
+                                                                %>
+                                                                <option value="<%=consultingroom.getType()%>_<%=consultingroom.getType()%>"><%=consultingroom.getConsultingroom()%></option> 
+                                                                <% }
+
+
+
+                                                                %>
 
                                                                 %>
                                                             </select>
@@ -454,7 +475,9 @@
                                                         </div>
                                                     </form>
                                                     <%}
-                                                        if (vst.getPreviouslocstion().equals("Records")) {%>
+                                                        String rec = vst.getPreviouslocstion();
+                                                        String[] recs = rec.split("_");
+                                                        if (recs[0].equals("records")){%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -493,21 +516,28 @@
                                                             <input type="hidden" name="cid" value="<%=patientconsultation.getId()%>"/>
                                                             <input type="hidden" name="visitid" value="<%=vst.getVisitid()%>"/>
                                                             <!-- <input type="submit" name="action" value="Forward to Accounts"/>-->
+
                                                             <select name="unitid">
                                                                 <%
-                                                                    List units = mgr.listUnits();
-                                                                    for (int j = 0; j < units.size(); j++) {
-                                                                        Units unit = (Units) units.get(j);
-                                                                %>
-                                                                <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
-                                                                <% }
-                                                                    List wards = mgr.listWard();
-                                                                    for (int j = 0; j < wards.size(); j++) {
-                                                                        Ward ward = (Ward) wards.get(j);
-                                                                %>
-                                                                <option value="<%=ward.getWardname()%>"><%=ward.getWardname()%></option> 
-                                                                <% }
 
+                                                                    List list = mgr.listWard();
+                                                                    for (int r = 0; r < list.size(); r++) {
+                                                                        Ward ward = (Ward) list.get(r);
+
+                                                                %>
+
+                                                                <option value="<%=ward.getType()%>_<%=ward.getWardid()%>"><%=ward.getWardname()%></option>
+                                                                <%}
+                                                                    List lists = mgr.listUnits();
+
+                                                                    for (int v = 0; v < lists.size(); v++) {
+                                                                        Units unit = (Units) lists.get(v);
+
+
+                                                                %>  
+
+                                                                <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option>
+                                                                <%}
                                                                 %>
                                                             </select>
                                                             <br/>
@@ -518,152 +548,7 @@
                                                             </button>
                                                         </div>
                                                         <%}%>
-                                                        <!--  <form action="action/accountsaction.jsp" method="post">
-                                                              <table class="table example display">
-                                                                  <thead>
-                                                                      <tr style="color: #000;">
-                                                                          <th>Requested </th>
-                                                                          <th>Quantity </th>
-                                                                          <th>Unit Cost </th>
-                                                                          <th>Total </th>
-                                                                          <th>Amount Paid</th>
-                                                                          <th>Outstanding Amount</th>
-                                                                          <th></th>
-                                                                      </tr>
-                                                                  </thead>
-                                                                  <tbody>
-                                                        <%
 
-                                                            List ptreatmentss = mgr.patientTreatment(vst.getVisitid());
-                                                            List pinvestigations = mgr.patientInvestigation(vst.getVisitid());
-                                                            for (int r = 0; r < ptreatmentss.size(); r++) {
-                                                                Patienttreatment ptPatienttreatments = (Patienttreatment) ptreatmentss.get(r);
-                                                                if (ptPatienttreatments.getDispensed().equalsIgnoreCase("No")) {
-                                                        %>
-                                                        <tr>
-                                                            <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%> </h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                                                data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%></td> </tr> <tr>
-                                                                <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> ">
-                                                        <%=mgr.getTreatment(ptPatienttreatments.getTreatmentid()).getTreatment()%> </td>
-                                                    <td><%=ptPatienttreatments.getQuantity()%> </td>
-                                                    <td><%=ptPatienttreatments.getPrice()%> </td>
-
-                                                    <td><%= (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice())%></td>
-                                            <input type="hidden" name="pid[]" value="<%=ptPatienttreatments.getId()%>"/>
-                                                        <% total = total + (ptPatienttreatments.getQuantity() * ptPatienttreatments.getPrice());%>
-                                                        </tr>
-
-                                                        <%}
-                                                            }
-                                                            for (int r = 0; r < pinvestigations.size(); r++) {
-                                                                Patientinvestigation patientinvestigation = (Patientinvestigation) pinvestigations.get(r);
-
-                                                                if (patientinvestigation.getPerformed().equalsIgnoreCase("Yes")) {
-
-                                                        %>
-                                                        <tr>
-                                                        <input type="hidden" name="vid[]" value="<%=patientinvestigation.getId()%>"/>
-                                                        <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%> <%=mgr.getPatientByID(vst.getPatientid()).getLname()%></h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                                            data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%></td> </tr> <tr>
-                                                            <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> ">
-                                                        <%=mgr.getInvestigation(patientinvestigation.getInvestigationid()).getInvestigation()%> </td>
-                                                    <td><%=patientinvestigation.getQuantity()%> </td>
-                                                    <td><%=patientinvestigation.getPrice()%></td>
-                                                        <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                            double tt = patientinvestigation.getPrice() * qty;%>
-                                                        <td><%=tt%></td>
-                                                        <td><%=tt%></td>
-                                                        <td>0</td>
-                                                        <td>Paid</td>
-                                                        <% total = total + patientinvestigation.getPrice();%> 
-
-                                                        </tr>
-
-                                                        <%}
-                                                            if (patientinvestigation.getPerformed().equalsIgnoreCase("No")) {%>
-                                                        <tr style="color:  red">
-                                                        <input type="hidden" name="vid[]" value="<%=patientinvestigation.getId()%>"/>
-                                                        <td >
-                                                        <%=mgr.getInvestigation(patientinvestigation.getInvestigationid()).getInvestigation()%> </td>
-                                                    <td><%=patientinvestigation.getQuantity()%> </td>
-                                                    <td><%=patientinvestigation.getPrice()%></td>
-                                                        <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                            double tt = patientinvestigation.getPrice() * qty;%>
-                                                        <td><%=tt%></td>
-                                                        <td><input type="text" name="nm_<%=patientinvestigation.getId()%>" readonly="readonly"/></td>
-                                                        <td><%=tt - patientinvestigation.getAmountpaid()%></td>
-                                                        <td>CANNOT AFFORD</td>
-                                                        <% total = total + patientinvestigation.getPrice();%> 
-
-                                                        </tr>
-
-                                                        <% } else {%>
-                                                        <tr>
-                                                        <input type="hidden" name="vid[]" value="<%=patientinvestigation.getId()%>"/>
-                                                        <td >
-                                                        <%=mgr.getInvestigation(patientinvestigation.getInvestigationid()).getInvestigation()%> </td>
-                                                    <td><%=patientinvestigation.getQuantity()%> </td>
-                                                    <td><%=patientinvestigation.getPrice()%></td>
-                                                        <% int qty = patientinvestigation.getQuantity() == 0 ? 1 : patientinvestigation.getQuantity();
-                                                            double tt = patientinvestigation.getPrice() * qty;%>
-                                                        <td><%=tt%></td>
-                                                        <td><input type="text" name="nm_<%=patientinvestigation.getId()%>"/></td>
-                                                        <td><%=tt - patientinvestigation.getAmountpaid()%></td>
-                                                        <td><input type="checkbox" name="checks[]" value="<%=patientinvestigation.getId()%>" /></td>
-                                                        <% total = total + patientinvestigation.getPrice();%> 
-
-                                                    </tr>
-
-                                                        <%}
-                                                            }%> 
-                                                        <tr>
-                                                            <td><%=mgr.getConsultationId(vst.getVisittype()).getContype()%></td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td><%=mgr.getConsultationId(vst.getVisittype()).getAmount()%></td>
-                                                        </tr>
-                                                        <tr>
-                                                            <td>Total Cost</td>
-                                                            <td></td>
-                                                            <td></td>
-                                                            <td><%=total + mgr.getConsultationId(vst.getVisittype()).getAmount()%></td>
-                                                        </tr>
-
-                                                        </tbody>
-
-                                                    </table>
-
-                                                    <div style="text-align: center;" class="form-actions">
-
-                                                        <!-- <input type="hidden" name="unitid" value="Accounts"/>-->
-                                                        <!--<input type="hidden" name="patient" value="<%=vst.getPatientid()%>"/>
-                                                        <input type="hidden" name="visitid" value="<%=vst.getVisitid()%>"/>
-                                                        <!-- <input type="submit" name="action" value="Forward to Accounts"/>-->
-                                                        <!-- <select name="unitid">
-                                                        <%
-                                                            List units = mgr.listUnits();
-                                                            for (int j = 0; j < units.size(); j++) {
-                                                                Units unit = (Units) units.get(j);
-                                                        %>
-                                                        <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
-                                                        <% }
-                                                            List wards = mgr.listWard();
-                                                            for (int j = 0; j < wards.size(); j++) {
-                                                                Ward ward = (Ward) wards.get(j);
-                                                        %>
-                                                        <option value="<%=ward.getWardname()%>"><%=ward.getWardname()%></option> 
-                                                        <% }
-
-                                                        %>
-                                                    </select>
-                                                    <br/>
-
-                                                    <button type="submit" name="action" value="Generate Receipt" class="btn btn-danger btn-large">
-
-                                                        <i class="icon-white icon-arrow-right"> </i> Forward
-                                                    </button>
-                                                </div>
-                                            </form>-->
                                                 </div>
                                             </div>
                                         </td>
@@ -671,12 +556,12 @@
 
                                     <tr>
                                         <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%></h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                            data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td> </tr> <tr>
+                                            data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()) == null ? mgr.sponsorshipDetails(vst.getPatientid()).getType() : mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td> </tr> <tr>
                                             <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> "> <%=vst.getPatientid()%>   </td>
-                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%></td>
+                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%>, <%=mgr.getPatientByID(vst.getPatientid()).getMidname()%> <%=mgr.getPatientByID(vst.getPatientid()).getLname()%></td>
                                         <td><%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%> </td>
 
-                                        <td><%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td>
+                                        <td><%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()) == null ? mgr.sponsorshipDetails(vst.getPatientid()).getType() : mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td>
                                         <td><%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%>   </td>
 
                                         <td><%=vst.getDate()%> </td>
@@ -686,7 +571,8 @@
                                                 <i class="icon-white icon-check"></i> Receipt
                                             </button></td>
                                     </tr>
-                                    <%}%> 
+                                    <%}
+                                        }%> 
 
                                 </tbody>
                             </table>

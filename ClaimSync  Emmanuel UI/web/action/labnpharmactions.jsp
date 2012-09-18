@@ -9,6 +9,11 @@
 <%@page import="java.util.Date"%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
+     Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
         Date dt = new Date();
@@ -61,7 +66,7 @@
                     }
                 }
                 if (labtest != null) {
-                    mgr.addLaborders("", id, patientid);
+                    mgr.addLaborders(user.getStaffid(), id, patientid);
                     // String[] investigations = investigation.split("<>");
                     for (int i = 0; i < labtest.length; i++) {
                         String[] investigationcode = labtest[i].split("><");
@@ -101,10 +106,11 @@
                     //mgr.addDosageMonitor(id, patienttreatmentid, "", "", "", null);
                 }
                 mgr.updateVisitNotes(id, notes);
-                mgr.updateVisitation(patientid, id, unitName, vitals, mgr.getPatientFolder(patientid).getStatus());
+                mgr.updateVisitation(patientid, id, unitName, vitals, (String)session.getAttribute("unit"));
+                mgr.updateVisitation(id, user.getStaffid());
                 //String registrationDate = request.getParameter("dor");
 
-                mgr.updateFolderLocation(mgr.getPatientFolder(patientid).getStatus(), unitName, patientid);
+                mgr.updateFolderLocation((String)session.getAttribute("unit"), unitName, patientid);
 
             }
         }

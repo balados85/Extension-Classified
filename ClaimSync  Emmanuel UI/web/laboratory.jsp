@@ -7,6 +7,11 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+    if (user == null) {
+        session.setAttribute("lasterror", "Please Login");
+        response.sendRedirect("index.jsp");
+    }%>
 <html>
     <head>
         <meta charset="utf-8">
@@ -66,7 +71,7 @@
             //get current date time with Date()
             Date date = new Date();
             //System.out.println(dateFormat.format(date));
-            List visits = mgr.listUnitVisitations("Laboratory", dateFormat.format(date));
+            List visits = mgr.listUnitVisitations((String) session.getAttribute("unit"), dateFormat.format(date));
             List treatments = null;
             // for (int i = 0; i < visits.size(); i++) {
             //   Visitationtable visit = (Visitationtable) visits.get(i);
@@ -109,7 +114,7 @@
                                     <li class="divider"></li>
 
                                     <li>
-                                        <a target="_blank" href="variables.less"><i class="icon-off"></i> Log Out</a>
+                                        <a target="_blank" href="logout.jsp"><i class="icon-off"></i> Log Out</a>
                                     </li>
 
                                 </ul>
@@ -183,8 +188,9 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <% for (int i = 0; i < visits.size(); i++) {
-                                            Visitationtable vst = (Visitationtable) visits.get(i);
+                                    <% if (visits != null) {
+                                            for (int i = 0; i < visits.size(); i++) {
+                                                Visitationtable vst = (Visitationtable) visits.get(i);
                                     %>
                                     <tr>
                                         <td colspan="7">
@@ -219,7 +225,7 @@
                                                                 %>
                                                                 <tr>
                                                                     <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%> </h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                                                        data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null ? mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%></td> </tr> <tr>
+                                                                        data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()) == null ? mgr.sponsorshipDetails(vst.getPatientid()).getType() : mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%></td> </tr> <tr>
                                                                         <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> "><%=mgr.getInvestigation(ptPatienttreatments.getInvestigationid()).getInvestigation()%> </td>
                                                                     <%if (ptPatienttreatments.getPerformed().equalsIgnoreCase("paid")) {%>
                                                                     <td> Result: <input type="text" name="results<%=ptPatienttreatments.getId()%>" value=""/><br/>
@@ -230,7 +236,7 @@
                                                                     <td><%=ptPatienttreatments.getPrice()%></td>
                                                                     <td>Paid</td>
                                                                     <%}
-                                                                            if (ptPatienttreatments.getPerformed().equalsIgnoreCase("Afford")) {%>
+                                                                        if (ptPatienttreatments.getPerformed().equalsIgnoreCase("Afford")) {%>
 
                                                                     <td>Unpaid</td>
                                                                     <td><%=ptPatienttreatments.getPrice()%></td>
@@ -242,7 +248,7 @@
                                                                     <td><%=ptPatienttreatments.getPrice()%></td>
                                                                     <td><input type="checkbox" name="afford[]" value="<%=ptPatienttreatments.getId()%>"/></td>
                                                                         <%}
-                                                                        if (ptPatienttreatments.getPerformed().equalsIgnoreCase("Yes")) {%>
+                                                                            if (ptPatienttreatments.getPerformed().equalsIgnoreCase("Yes")) {%>
                                                                     <td><%=ptPatienttreatments.getResult()%></td>
                                                                     <td><%=ptPatienttreatments.getPrice()%></td>
                                                                     <td>Paid</td>
@@ -261,22 +267,29 @@
                                                             <tr>
                                                                 <td>
 
-                                                                    <!--  <select name="unitid">
-                                                                    <%
-                                                                        List consultingrooms = mgr.listConRooms();
-                                                                        List units = mgr.listUnits();
-                                                                        for (int j = 0; j < units.size(); j++) {
-                                                                            Units unit = (Units) units.get(j);
-                                                                            if (vst.getPreviouslocstion().equalsIgnoreCase("Accounts")) {%>
-                                                                            <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
-                                                                    <% }
-                                                                        if (vst.getPreviouslocstion().equals("Room 1")) {
-                                                                    %>
-                                                                    <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
-                                                                    <% }
-                                                                        }
-                                                                    %>
-                                                                </select>-->
+                                                                    <select name="unitid">
+                                                                        <%
+                                                                            List consultingrooms = mgr.listConRooms();
+                                                                            List units = mgr.listUnits();
+                                                                            String previous = vst.getPreviouslocstion();
+                                                                                String[] strs = previous.split("_");
+                                                                            for (int j = 0; j < units.size(); j++) {
+                                                                                Units unit = (Units) units.get(j);
+                                                                                
+                                                                                if (strs[0].equalsIgnoreCase("account")) {
+                                                                                    if (unit.getType().equalsIgnoreCase("records")) {
+                                                                        %>
+                                                                        <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option> 
+                                                                        <% }
+                                                                            }
+                                                                            if (strs[0].equalsIgnoreCase("consultation")) {
+                                                                                if (unit.getType().equalsIgnoreCase("account")) {
+                                                                        %>
+                                                                        <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option> 
+                                                                        <% }
+                                                                            }}
+                                                                        %>
+                                                                    </select>
 
 
                                                                 </td>
@@ -298,13 +311,13 @@
                                     </tr>
 
                                     <tr>
-                                        <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%></h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
-                                            data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td> </tr> <tr>
+                                        <td class="patient" rel="popover" data-original-title="<span style='text-align:center;'> <h3>Patient Information Summary </h3> <h5><%=mgr.getPatientByID(vst.getPatientid()).getFname()%>, <%=mgr.getPatientByID(vst.getPatientid()).getMidname()%> <%=mgr.getPatientByID(vst.getPatientid()).getLname()%></h5> <h5><b> Date of Birth :</b> <%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%></h5> </span>"
+                                            data-content="<table class='table table-bordered'> <tr> <td> Gender  </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getGender()%> </td> </tr> <tr> <td> Employer </td> <td> <%=mgr.getPatientByID(vst.getPatientid()).getEmployer()%> </td>  </tr> <tr> <td> Sponsor </td> <td> <%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()) == null ? mgr.sponsorshipDetails(vst.getPatientid()).getType() : mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%> </td> </tr> <tr>
                                             <td> Policy Number </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%> </td> </tr> <tr> <td> Benefit Plan </td> <td> <%=mgr.sponsorshipDetails(vst.getPatientid()).getBenefitplan()%> </td> </tr>  </table> "> <%=vst.getPatientid()%>   </td>
-                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%> </td>
+                                        <td><%=mgr.getPatientByID(vst.getPatientid()).getFname()%>, <%=mgr.getPatientByID(vst.getPatientid()).getMidname()%> <%=mgr.getPatientByID(vst.getPatientid()).getLname()%> </td>
                                         <td><%=mgr.getPatientByID(vst.getPatientid()).getDateofbirth()%> </td>
 
-                                        <td><%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(vst.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%>  </td>
+                                        <td><%=mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()) == null ? mgr.sponsorshipDetails(vst.getPatientid()).getType() : mgr.getSponsor(mgr.sponsorshipDetails(vst.getPatientid()).getSponsorid()).getSponsorname()%>  </td>
                                         <td><%=mgr.sponsorshipDetails(vst.getPatientid()).getMembershipid()%>   </td>
 
                                         <td><%=vst.getDate()%> </td>
@@ -314,7 +327,8 @@
                                                 <i class="icon-white icon-check"></i> Update 
                                             </button></td>
                                     </tr>
-                                    <%}%> 
+                                    <%}
+                                        }%> 
 
                                 </tbody>
                             </table>

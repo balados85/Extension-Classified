@@ -43,4 +43,7 @@
     <table-filter match-name="permission"/>
     <table-filter match-name="staffPermission"/>
     <table-filter match-name="department"/>
+    <table-filter match-name="users"/>
+    <table-filter match-name="loggingtable"/>
+    <table-filter match-name="appoint"/>
 </hibernate-reverse-engineering>

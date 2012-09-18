@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 12, 2012 4:07:18 PM by Hibernate Tools 3.2.1.GA
+// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
 
 
 
@@ -13,14 +13,16 @@ public class Ward  implements java.io.Serializable {
      private String wardname;
      private int numberofbeds;
      private int occupied;
+     private String type;
 
     public Ward() {
     }
 
-    public Ward(String wardname, int numberofbeds, int occupied) {
+    public Ward(String wardname, int numberofbeds, int occupied, String type) {
        this.wardname = wardname;
        this.numberofbeds = numberofbeds;
        this.occupied = occupied;
+       this.type = type;
     }
    
     public Integer getWardid() {
@@ -50,6 +52,13 @@ public class Ward  implements java.io.Serializable {
     
     public void setOccupied(int occupied) {
         this.occupied = occupied;
+    }
+    public String getType() {
+        return this.type;
+    }
+    
+    public void setType(String type) {
+        this.type = type;
     }
 
 

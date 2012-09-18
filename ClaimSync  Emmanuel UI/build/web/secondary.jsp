@@ -6,6 +6,12 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="entities.*,java.util.List,java.util.Date,java.text.SimpleDateFormat,java.text.DateFormat" %>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -401,7 +407,8 @@
 
                                     Date date = new Date();
                                     //System.out.println(dateFormat.format(date));
-                                    List visits = mgr.listSecondaryConsultation("Room 1");
+                                    List visits = mgr.listSecondaryConsultation((String)session.getAttribute("unit"));
+                                    if(visits != null){
                                     for (int i = 0; i < visits.size(); i++) {
                                         Visitationtable visit = (Visitationtable) visits.get(i);
                                         vs = mgr.currentVisitations(visit.getVisitid());
@@ -410,11 +417,11 @@
                                 %>
                                 <tr>
                                     <td>
-                                        <a href="condetails.jsp?patientid=<%=visit.getPatientid()%>&id=<%=visit.getVisitid()%>"> 
+                                       <!-- <a href="condetails.jsp?patientid=<%=visit.getPatientid()%>&id=<%=visit.getVisitid()%>"> -->
                                             <%= visit.getPatientid()%> </a> 
                                     </td>
                                     <td>
-                                        <%= mgr.getPatientByID(visit.getPatientid()).getFname()%>
+                                        <%= mgr.getPatientByID(visit.getPatientid()).getFname()%>, <%= mgr.getPatientByID(visit.getPatientid()).getMidname()%> <%= mgr.getPatientByID(visit.getPatientid()).getLname()%>
                                     </td>
                                     <td>
                                         <%=mgr.getSponsor(mgr.sponsorshipDetails(visit.getPatientid()).getSponsorid())==null?mgr.sponsorshipDetails(visit.getPatientid()).getType():mgr.getSponsor(mgr.sponsorshipDetails(visit.getPatientid()).getSponsorid()).getSponsorname()%> 
@@ -427,7 +434,7 @@
                                     </td>
                                 </tr>
                                 <% }
-
+                                    }
                                 %>
                             </tbody>
                         </table>
@@ -453,7 +460,7 @@
          } else {
          file = "getnhistreatment.jsp";
          }*/
-
+if(visits != null){
         for (int i = 0; i < visits.size(); i++) {
             Visitationtable visit = (Visitationtable) visits.get(i);
             // vs = mgr.currentVisitations(visit.getVisitid());
@@ -1267,21 +1274,20 @@
 
                                 <td>
                                     <select name="unitid">
-                                        <%
-                                            List units = mgr.listUnits();
-                                            for (int j = 0; j < units.size(); j++) {
-                                                Units unit = (Units) units.get(j);
-                                        %>
-                                        <option value="<%=unit.getUnitname()%>"><%=unit.getUnitname()%></option> 
-                                        <% }
-                                            List wards = mgr.listWard();
-                                            for (int j = 0; j < wards.size(); j++) {
-                                                Ward ward = (Ward) wards.get(j);
-                                        %>
-                                        <option value="<%=ward.getWardname()%>"><%=ward.getWardname()%></option> 
-                                        <% }
+                                            <% List list = mgr.listWard();
+                                                for (int j = 0; j < list.size(); j++) {
+                                                    Ward ward = (Ward) list.get(j);
+                                            %>
+                                            <option value="<%=ward.getType()%>_<%=ward.getWardid()%>"><%=ward.getWardname()%></option>
+                                            <%}
+                                                List lists = mgr.listUnits();
 
-                                        %>
+                                                for (int r = 0; r < lists.size(); r++) {
+                                                    Units unit = (Units) lists.get(r);
+                                            %>  
+                                            <option value="<%=unit.getType()%>_<%=unit.getUnitid()%>"><%=unit.getUnitname()%></option>
+                                            <%}
+                                               %>
                                     </select>
                                     <input type="hidden" name="patientid" value="<%=visit.getPatientid()%>"/>
                                     <input type="hidden" name="id" value="<%=visit.getVisitid()%>"/> 
@@ -1323,6 +1329,7 @@
     <% //}%>
     <%   //  }
         }
+}
     %>
 
 </body>

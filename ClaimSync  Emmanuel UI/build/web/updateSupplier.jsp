@@ -5,13 +5,19 @@
 --%>
 
 
-<%@page import="entities.Post"%>
-<%@page import="entities.ItemsTable"%>
+<%@page import="entities.*"%>
+
 <%@page import="java.util.*"%>
-<%@page import="entities.itemHelper"%>
-<%@page import="entities.HibernateUtil"%>
+
+<%@page import="helper.HibernateUtil"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
+
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -118,7 +124,7 @@
                 int id = Integer.parseInt(id1);
                 HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
-                itemHelper itm = new itemHelper();
+                HMSHelper itm = new HMSHelper();
 
                 List itmss = itm.EditSups(id);
                 for (int i = 0; i < itmss.size(); i++) {

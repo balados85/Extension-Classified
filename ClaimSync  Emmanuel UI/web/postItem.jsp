@@ -10,7 +10,11 @@
 <%@page import="entities.*"%>
 <%@page import="helper.HibernateUtil"%>
 
-
+<% Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            } %>
 
 <%@page import="javax.servlet.jsp.tagext.TryCatchFinally"%>
 <style type="text/css">

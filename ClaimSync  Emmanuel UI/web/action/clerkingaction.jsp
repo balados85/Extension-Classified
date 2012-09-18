@@ -5,6 +5,11 @@
 --%>
 <%@page import="entities.*,helper.HibernateUtil" %>
 <% try {
+     Users user = (Users) session.getAttribute("staff");
+            if(user == null){
+                session.setAttribute("lasterror", "Please Login");
+                response.sendRedirect("index.jsp");
+            }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
         if ("clerking".equals(request.getParameter("action"))) {
