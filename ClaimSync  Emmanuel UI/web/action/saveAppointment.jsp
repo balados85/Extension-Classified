@@ -16,7 +16,7 @@
     Users current = (Users) session.getAttribute("staff");
             if(current == null){
                 session.setAttribute("lasterror", "Please Login");
-                response.sendRedirect("index.jsp");
+                response.sendRedirect("appointment.jsp");
             }
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction();
 
@@ -54,7 +54,7 @@
 
         HibernateUtil.getSessionFactory().getCurrentSession().beginTransaction().commit();
         HibernateUtil.getSessionFactory().close();
-        response.sendRedirect("../index.jsp");
+        response.sendRedirect("../appointment.jsp");
     } catch (Exception ex) {
         HibernateUtil.getSessionFactory().getCurrentSession().getTransaction().rollback();
         if (ServletException.class.isInstance(ex)) {

@@ -204,7 +204,7 @@ public class HMSHelper {
         return conroom;
     }
 
-    public Visitationtable createNewVisit(String patientID, String doctor, String vitals, String status, int type, String notes) {
+    public Visitationtable createNewVisit(String patientID, String doctor, String vitals, String status, String previous, int type, String notes) {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         Visitationtable visitation = new Visitationtable();
@@ -218,7 +218,7 @@ public class HMSHelper {
         //visitation.setAdmissiondate(new Date());
         // visitation.setDischargedate(discharge);
         visitation.setVisittype(type);
-        visitation.setPreviouslocstion("Records");
+        visitation.setPreviouslocstion(previous);
         visitation.setReview(Boolean.FALSE);
         session.save(visitation);
         session.getTransaction().commit();
@@ -559,6 +559,17 @@ public class HMSHelper {
         session.save(symptoms);
         session.getTransaction().commit();
         return symptoms;
+    }
+    
+    public AppointType addAppointType(String type) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        AppointType appointType = new AppointType();
+        appointType.setType(type);
+        session.save(appointType);
+        session.getTransaction().commit();
+        return appointType;
     }
 
     public Users addUser(Users users) throws ParseException {
@@ -1408,6 +1419,14 @@ public class HMSHelper {
         return result;
     }
 
+    public List listAppointment(String title) {
+        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from Appoint where title='"+title+"'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+
     public List listConsultation() {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
@@ -1473,6 +1492,14 @@ public class HMSHelper {
         session = HibernateUtil.getSessionFactory().getCurrentSession();
         session.beginTransaction();
         List result = session.createQuery("from Sponsorship where type='Cooperate'").list();
+        session.getTransaction().commit();
+        return result;
+    }
+    
+    public List listAppointType() {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+        List result = session.createQuery("from AppointType").list();
         session.getTransaction().commit();
         return result;
     }
@@ -1812,6 +1839,19 @@ public class HMSHelper {
         session.getTransaction().commit();
         return app;
     }
+    
+    public Appoint honorAppointment(int id) throws ParseException {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Appoint app = (Appoint) session.get(Appoint.class, id);
+
+        app.setHonored(Boolean.TRUE);
+
+        session.update(app);
+        session.getTransaction().commit();
+        return app;
+    }
 
     public List EditAppointment(String title) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -1939,6 +1979,19 @@ public class HMSHelper {
         session.update(ward);
         session.getTransaction().commit();
         return ward;
+    }
+    
+    public AppointType updateAppointType(int wardid, String type) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        AppointType appointType = (AppointType) session.get(AppointType.class, wardid);
+        appointType.setType(type);
+        //appointType.setOccupied(ward.getOccupied() + 1);
+
+        session.update(appointType);
+        session.getTransaction().commit();
+        return appointType;
     }
 
     public Dosagemonitor updateDosage(int dosageid, String morning, String afternoon, String evening, int patientTreatmentid, int visitid, Date date) {
@@ -2146,6 +2199,16 @@ public class HMSHelper {
 
         session.getTransaction().commit();
         return sponsor;
+    }
+    
+    public AppointType getAppointTypeByid(int typeid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        AppointType appointType = (AppointType) session.get(AppointType.class, typeid);
+
+        session.getTransaction().commit();
+        return appointType;
     }
 
     public Clerkingquestion getClerkingQuestionByid(int questionid) {
@@ -2468,6 +2531,15 @@ public class HMSHelper {
         return dosageMonitor;
     }
 
+    public Appoint getAppointmentById(int id){
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        Appoint appoint = (Appoint) session.get(Appoint.class, id);
+        //session.delete(dosageMonitor);
+        session.getTransaction().commit();
+        return appoint;
+    }
 
     /*
      * Deleting items from the system
@@ -2643,6 +2715,16 @@ public class HMSHelper {
         session.delete(stafftable);
         session.getTransaction().commit();
         return stafftable;
+    }
+    
+    public AppointType deleteAppointType(int typeid) {
+        session = HibernateUtil.getSessionFactory().getCurrentSession();
+        session.beginTransaction();
+
+        AppointType appointType = (AppointType) session.get(AppointType.class, typeid);
+        session.delete(appointType);
+        session.getTransaction().commit();
+        return appointType;
     }
 
     public Department deleteDepartment(int departmentid) {

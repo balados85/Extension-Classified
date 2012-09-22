@@ -12,7 +12,7 @@
             if(user == null){
                 session.setAttribute("lasterror", "Please Login");
                 response.sendRedirect("index.jsp");
-            } %>
+            }HMSHelper mgr = new HMSHelper();  %>
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -65,7 +65,7 @@
                             </thead>
                             <tbody>
                                 <%
-                                    HMSHelper mgr = new HMSHelper();
+                                    //HMSHelper mgr = new HMSHelper();
                                     DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                                     //Patient p = (Patient)session.getAttribute("patient");
                                     //get current date time with Date()
@@ -86,7 +86,7 @@
                                 <tr>
                                     <td><%=laborders.getPatientid()%></td>
                                     <td><%=mgr.getPatientByID(laborders.getPatientid()).getFname()%>, <%=mgr.getPatientByID(laborders.getPatientid()).getMidname()%> <%=mgr.getPatientByID(laborders.getPatientid()).getLname()%></td>
-                                    <td><%=mgr.getStafftableByid(laborders.getFromdoc()).getLastname()%> <%=mgr.getStafftableByid(laborders.getFromdoc()).getLastname() %></td>
+                                    <td><%=mgr.getStafftableByid(laborders.getFromdoc())==null?"":mgr.getStafftableByid(laborders.getFromdoc()).getLastname()%> <%=mgr.getStafftableByid(laborders.getFromdoc())==null?"":mgr.getStafftableByid(laborders.getFromdoc()).getLastname() %></td>
                                     <td><%=laborders.getOrderdate()%></td>
                                     <td><%=laborders.getDonedate()%></td>
                                     <td>

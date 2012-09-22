@@ -101,7 +101,7 @@
                         <ul class="nav pull-right">
 
                             <li class="dropdown">
-                                <a class="active" > Logged in as:  Mr. Amoo </a>
+                                <a class="active" > Logged in as:  <%=mgr.getStafftableByid(user.getStaffid()).getLastname() %> <%=mgr.getStafftableByid(user.getStaffid()).getOthername() %></a>
 
                             </li>
                             <li class="divider-vertical"></li>
@@ -476,8 +476,9 @@
                                                     </form>
                                                     <%}
                                                         String rec = vst.getPreviouslocstion();
-                                                        String[] recs = rec.split("_");
-                                                        if (recs[0].equals("records")){%>
+                                                        String[] recs = rec.split("_");%>
+                                                        <%=rec%>
+                                                        <%if (recs[0].equals("records")){%>
                                                     <form action="action/accountsaction.jsp" method="post">
                                                         <table class="table example display">
                                                             <thead>
@@ -547,6 +548,7 @@
                                                                 <i class="icon-white icon-arrow-right"> </i> Forward
                                                             </button>
                                                         </div>
+                                                            </form>
                                                         <%}%>
 
                                                 </div>
@@ -723,8 +725,7 @@
         $("#<%=vst.getVisitid()%>_adddrug_dialog").dialog('open');
         
     })
-   
-    
+     
 </script>
 
 

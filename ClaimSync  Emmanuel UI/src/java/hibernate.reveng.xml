@@ -46,4 +46,5 @@
     <table-filter match-name="users"/>
     <table-filter match-name="loggingtable"/>
     <table-filter match-name="appoint"/>
+    <table-filter match-name="appointType"/>
 </hibernate-reverse-engineering>

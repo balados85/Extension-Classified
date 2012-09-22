@@ -14,7 +14,7 @@
             if(user == null){
                 session.setAttribute("lasterror", "Please Login");
                 response.sendRedirect("index.jsp");
-            } %>
+            } HMSHelper mgr = new HMSHelper();%>
 <html>
     <head>
         <%@include file="widgets/stylesheets.jsp" %>
@@ -114,7 +114,7 @@
                             </thead>
                             <tbody>
                                 <%
-                                    HMSHelper mgr = new HMSHelper();
+                                    //HMSHelper mgr = new HMSHelper();
                                     List allPTreatments = null;
                                     List allPInvs = null;
 

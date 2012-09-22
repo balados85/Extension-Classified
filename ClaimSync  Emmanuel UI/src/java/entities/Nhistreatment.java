@@ -1,5 +1,5 @@
 package entities;
-// Generated Sep 17, 2012 11:22:58 AM by Hibernate Tools 3.2.1.GA
+// Generated Sep 19, 2012 1:13:50 PM by Hibernate Tools 3.2.1.GA
 
 
 
